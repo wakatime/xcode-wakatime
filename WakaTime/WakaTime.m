@@ -49,7 +49,7 @@ static WakaTime *sharedPlugin;
         self.bundle = plugin;
         
         // Prompt for api_key if not already set
-        if ([self getApiKey] == NULL) {
+        if ([self getApiKey] == NULL || [[self getApiKey] length] == 0) {
             [self promptForApiKey];
         }
         
