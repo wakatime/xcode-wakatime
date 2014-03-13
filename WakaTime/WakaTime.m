@@ -42,14 +42,15 @@ static WakaTime *sharedPlugin;
 }
 
 - (id)initWithBundle:(NSBundle *)plugin {
-    NSLog(@"Initializing WakaTime plugin (wakatime.com)");
+    NSLog(@"Initializing WakaTime plugin (http://wakatime.com)");
     if (self = [super init]) {
         
         // reference to plugin's bundle, for resource access
         self.bundle = plugin;
         
         // Prompt for api_key if not already set
-        if ([self getApiKey] == NULL || [[self getApiKey] length] == 0) {
+        NSString *api_key = [[self getApiKey] stringByReplacingOccurrencesOfString:@" " withString:@""];
+        if (api_key == NULL || [api_key length] == 0) {
             [self promptForApiKey];
         }
         
@@ -127,7 +128,7 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)sendAction:(BOOL)isWrite {
-    NSLog(@"Sending write(%hhd) ping to api at %f for %@", isWrite, self.lastTime, self.lastFile);
+    //NSLog(@"Sending write(%hhd) ping to api at %f for %@", isWrite, self.lastTime, self.lastFile);
     
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath: @"/usr/bin/python"];
