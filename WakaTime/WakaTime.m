@@ -5,14 +5,14 @@
 //
 //  :maintainer: WakaTime <support@wakatime.com>
 //  :license: BSD, see LICENSE for more details.
-//  :website: https://www.wakatime.com
+//  :website: https://wakatime.com/
 
 #import "WakaTime.h"
 #import "XcodeClasses.h"
 
 static NSString *VERSION = @"1.0.0";
 static NSString *EDITOR_NAME = @"xcode";
-static NSString *WAKATIME_API = @"https://www.wakatime.com/api/v1/actions";
+static NSString *WAKATIME_API = @"https://wakatime.com/api/v1/actions";
 static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime-cli.py";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
 static int FREQUENCY = 2;  // minutes

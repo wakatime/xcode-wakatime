@@ -5,7 +5,7 @@
 //
 //  :maintainer: WakaTime <support@wakatime.com>
 //  :license: BSD, see LICENSE for more details.
-//  :website: https://www.wakatime.com
+//  :website: https://wakatime.com/
 
 #import <Foundation/Foundation.h>
 

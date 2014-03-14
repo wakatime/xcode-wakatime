@@ -6,7 +6,7 @@
 #
 #  :maintainer: WakaTime <support@wakatime.com>
 #  :license: BSD, see LICENSE for more details.
-#  :website: https://www.wakatime.com
+#  :website: https://wakatime.com/
 
 set -e
 set -x

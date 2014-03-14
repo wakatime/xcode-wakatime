@@ -6,7 +6,7 @@ Fully automatic time tracking for Xcode.
 Installation
 ------------
 
-1. Get an api key from: https://www.wakatime.com/#apikey
+1. Get an api key from: https://wakatime.com/#apikey
 
 2. Using [Alcatraz](https://github.com/supermarin/Alcatraz):
 
@@ -16,7 +16,7 @@ Installation
 
   c) Restart Xcode.
   
-3. You will see a prompt asking for your [api key](https://www.wakatime.com/#apikey). Enter your api key, then click `OK`.
+3. You will see a prompt asking for your [api key](https://wakatime.com/#apikey). Enter your api key, then click `OK`.
 
 4. Use Xcode and your time will automatically be tracked for you.
 
@@ -25,5 +25,5 @@ Installation
 Screen Shots
 ------------
 
-![Project Overview](https://www.wakatime.com/static/img/ScreenShots/Screen Shot 2013-10-26 at 5.04.01 PM.png)
+![Project Overview](https://wakatime.com/static/img/ScreenShots/Screen Shot 2013-10-26 at 5.04.01 PM.png)
 
