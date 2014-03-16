@@ -157,7 +157,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "${PROJECT_DIR}/WakaTime/install_dependencies.sh";
+			shellScript = "\"${PROJECT_DIR}/WakaTime/install_dependencies.sh\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
