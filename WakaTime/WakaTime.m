@@ -82,15 +82,11 @@ static WakaTime *sharedPlugin;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
     // check if we should send this action to api
-    if (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime) {
+    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendAction:false];
     }
-}
-
--(void)handleMouseMove:(NSNotification *)notification {
-    NSLog(@"****** %@: %@", notification.name, notification.object);
 }
 
 -(void)handleChangeFile:(NSNotification *)notification {
@@ -106,7 +102,7 @@ static WakaTime *sharedPlugin;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
     // check if we should send this action to api
-    if (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime) {
+    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendAction:false];
@@ -122,15 +118,19 @@ static WakaTime *sharedPlugin;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
     // always send action to api if isWrite is true
-    self.lastFile = currentFile;
-    self.lastTime = currentTime;
-    [self sendAction:true];
+    if (currentFile) {
+        self.lastFile = currentFile;
+        self.lastTime = currentTime;
+        [self sendAction:true];
+    }
+}
+
+-(void)handleMouseMove:(NSNotification *)notification {
+    NSLog(@"****** %@: %@", notification.name, notification.object);
 }
 
 -(void)sendAction:(BOOL)isWrite {
-//    NSLog(@"Sending write(%hhd) ping to api at %f for %@", isWrite, self.lastTime, self.lastFile);
-    if(self.lastFile)
-    {
+    if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
         [task setLaunchPath: @"/usr/bin/python"];
         
@@ -143,22 +143,7 @@ static WakaTime *sharedPlugin;
         if (isWrite)
             [arguments addObject:@"--write"];
         [task setArguments: arguments];
-        /*
-         NSPipe *pipe;
-         pipe = [NSPipe pipe];
-         [task setStandardOutput: pipe];
-         
-         NSFileHandle *file;
-         file = [pipe fileHandleForReading];*/
-        
         [task launch];
-        /*
-         NSData *data;
-         data = [file readDataToEndOfFile];
-         
-         NSString *string;
-         string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-         NSLog (@"grep returned:\n%@", string);*/
     }
 }
 
