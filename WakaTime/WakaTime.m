@@ -42,8 +42,8 @@ static WakaTime *sharedPlugin;
 }
 
 - (id)initWithBundle:(NSBundle *)plugin {
-    NSLog(@"Initializing WakaTime plugin (http://wakatime.com)");
     if (self = [super init]) {
+        NSLog(@"Initializing WakaTime plugin (http://wakatime.com)");
         
         // reference to plugin's bundle, for resource access
         self.bundle = plugin;
