@@ -13,6 +13,8 @@ Installation
   a) Click `Window` -> `Package Manager` inside Xcode.
 
   b) Type `WakaTime`, then click the plugin icon on the left to install.
+  
+  ![Alcatraz Window](https://wakatime.com/static/img/ScreenShots/alcatraz_window.png)
 
   c) Restart Xcode.
   
