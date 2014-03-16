@@ -128,36 +128,38 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)sendAction:(BOOL)isWrite {
-    //NSLog(@"Sending write(%hhd) ping to api at %f for %@", isWrite, self.lastTime, self.lastFile);
-    
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath: @"/usr/bin/python"];
-    
-    NSMutableArray *arguments = [NSMutableArray array];
-    [arguments addObject:[NSHomeDirectory() stringByAppendingPathComponent:WAKATIME_CLI]];
-    [arguments addObject:@"--file"];
-    [arguments addObject:self.lastFile];
-    [arguments addObject:@"--plugin"];
-    [arguments addObject:[NSString stringWithFormat:@"%@/%@", EDITOR_NAME, VERSION]];
-    if (isWrite)
-        [arguments addObject:@"--write"];
-    [task setArguments: arguments];
-    /*
-    NSPipe *pipe;
-    pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    
-    NSFileHandle *file;
-    file = [pipe fileHandleForReading];*/
-    
-    [task launch];
-    /*
-    NSData *data;
-    data = [file readDataToEndOfFile];
-    
-    NSString *string;
-    string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-    NSLog (@"grep returned:\n%@", string);*/
+//    NSLog(@"Sending write(%hhd) ping to api at %f for %@", isWrite, self.lastTime, self.lastFile);
+    if(self.lastFile)
+    {
+        NSTask *task = [[NSTask alloc] init];
+        [task setLaunchPath: @"/usr/bin/python"];
+        
+        NSMutableArray *arguments = [NSMutableArray array];
+        [arguments addObject:[NSHomeDirectory() stringByAppendingPathComponent:WAKATIME_CLI]];
+        [arguments addObject:@"--file"];
+        [arguments addObject:self.lastFile];
+        [arguments addObject:@"--plugin"];
+        [arguments addObject:[NSString stringWithFormat:@"%@/%@", EDITOR_NAME, VERSION]];
+        if (isWrite)
+            [arguments addObject:@"--write"];
+        [task setArguments: arguments];
+        /*
+         NSPipe *pipe;
+         pipe = [NSPipe pipe];
+         [task setStandardOutput: pipe];
+         
+         NSFileHandle *file;
+         file = [pipe fileHandleForReading];*/
+        
+        [task launch];
+        /*
+         NSData *data;
+         data = [file readDataToEndOfFile];
+         
+         NSString *string;
+         string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+         NSLog (@"grep returned:\n%@", string);*/
+    }
 }
 
 // Read api key from config file
