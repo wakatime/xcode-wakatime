@@ -10,8 +10,9 @@
 #import "WakaTime.h"
 #import "XcodeClasses.h"
 
-static NSString *VERSION = @"1.0.0";
-static NSString *EDITOR_NAME = @"xcode";
+static NSString *VERSION = @"1.0.1";
+static NSString *XCODE_VERSION = nil;
+static NSString *XCODE_BUILD = nil;
 static NSString *WAKATIME_API = @"https://wakatime.com/api/v1/actions";
 static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime-cli.py";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
@@ -30,11 +31,16 @@ static WakaTime *sharedPlugin;
 @implementation WakaTime
 
 + (void)pluginDidLoad:(NSBundle *)plugin {
-    CONFIG_FILE = [NSHomeDirectory() stringByAppendingPathComponent:CONFIG_FILE];
     static id sharedPlugin = nil;
     static dispatch_once_t onceToken;
     NSString *currentApplicationName = [[NSBundle mainBundle] infoDictionary][@"CFBundleName"];
     if ([currentApplicationName isEqual:@"Xcode"]) {
+        
+        // Set runtime constants
+        CONFIG_FILE = [NSHomeDirectory() stringByAppendingPathComponent:CONFIG_FILE];
+        XCODE_VERSION = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+        XCODE_BUILD = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+        
         dispatch_once(&onceToken, ^{
             sharedPlugin = [[self alloc] initWithBundle:plugin];
         });
@@ -43,7 +49,7 @@ static WakaTime *sharedPlugin;
 
 - (id)initWithBundle:(NSBundle *)plugin {
     if (self = [super init]) {
-        NSLog(@"Initializing WakaTime plugin (http://wakatime.com)");
+        NSLog(@"Initializing WakaTime plugin v%@ (http://wakatime.com)", VERSION);
         
         // reference to plugin's bundle, for resource access
         self.bundle = plugin;
@@ -139,7 +145,7 @@ static WakaTime *sharedPlugin;
         [arguments addObject:@"--file"];
         [arguments addObject:self.lastFile];
         [arguments addObject:@"--plugin"];
-        [arguments addObject:[NSString stringWithFormat:@"%@/%@", EDITOR_NAME, VERSION]];
+        [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
         [task setArguments: arguments];
