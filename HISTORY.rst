@@ -3,6 +3,13 @@ History
 -------
 
 
+2.0.2 (2014-07-24)
+++++++++++++++++++
+
+- use unique logger namespace to prevent collisions in shared plugin environments
+- option in .wakatime.cfg to obfuscate file names
+
+
 2.0.1 (2014-05-26)
 ++++++++++++++++++
 
