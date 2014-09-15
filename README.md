@@ -27,5 +27,4 @@ Installation
 Screen Shots
 ------------
 
-![Project Overview](https://wakatime.com/static/img/ScreenShots/Screen Shot 2013-10-26 at 5.04.01 PM.png)
-
+![Project Overview](https://wakatime.com/static/img/ScreenShots/ScreenShot-2015-09-15.png)
