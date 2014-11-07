@@ -6,7 +6,7 @@ Fully automatic time tracking for Xcode.
 Installation
 ------------
 
-1. Install [Alcatraz](https://github.com/supermarin/Alcatraz#installation).
+1. Install [Alcatraz](https://github.com/supermarin/Alcatraz#installation), the Xcode plugin manager.
 
 2. Using [Alcatraz](https://github.com/supermarin/Alcatraz):
 
