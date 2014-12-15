@@ -10,7 +10,7 @@
 #import "WakaTime.h"
 #import "XcodeClasses.h"
 
-static NSString *VERSION = @"2.0.3";
+static NSString *VERSION = @"2.0.4";
 static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
 static NSString *WAKATIME_API = @"https://wakatime.com/api/v1/actions";
