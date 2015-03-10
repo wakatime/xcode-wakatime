@@ -13,8 +13,8 @@
 static NSString *VERSION = @"2.0.5";
 static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
-static NSString *WAKATIME_API = @"https://wakatime.com/api/v1/actions";
-static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime-cli.py";
+static NSString *WAKATIME_API = @"https://wakatime.com/api/v1/heartbeats";
+static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/cli.py";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
 static int FREQUENCY = 2;  // minutes
 
