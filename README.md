@@ -18,7 +18,7 @@ Installation
 
   c) Restart Xcode.
   
-3. Enter your [api key](https://wakatime.com/settings#apikey) from https://wakatime.com/settings#apikey, then click `OK`.
+3. Enter your [api key](https://wakatime.com/settings#apikey), then click `OK`.
 
 4. Use Xcode like you normally do and your time will be tracked for you automatically.
 
