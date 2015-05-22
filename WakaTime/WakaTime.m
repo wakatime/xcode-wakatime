@@ -10,7 +10,7 @@
 #import "WakaTime.h"
 #import "XcodeClasses.h"
 
-static NSString *VERSION = @"2.0.7";
+static NSString *VERSION = @"2.0.8";
 static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
 static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/cli.py";
@@ -67,15 +67,21 @@ static WakaTime *sharedPlugin;
         //[notification_center addObserver:self selector:@selector(handleMouseMove:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
 
         // setup File menu item
-        NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
-        if (menuItem) {
-            [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
-            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"WakaTime API Key" action:@selector(promptForApiKey) keyEquivalent:@""];
-            [actionMenuItem setTarget:self];
-            [[menuItem submenu] addItem:actionMenuItem];
-        }
+        [self performSelector:@selector(createMenuItem) withObject:nil afterDelay:3];
     }
     return self;
+}
+
+-(void)createMenuItem {
+    NSMenuItem *fileMenuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
+    if (fileMenuItem) {
+        [[fileMenuItem submenu] addItem:[NSMenuItem separatorItem]];
+        NSMenuItem *wakatimeMenuItem = [[NSMenuItem alloc] initWithTitle:@"WakaTime API Key"
+                                                            action:@selector(promptForApiKey)
+                                                            keyEquivalent:@""];
+        wakatimeMenuItem.target = self;
+        [[fileMenuItem submenu] addItem:wakatimeMenuItem];
+    }
 }
 
 -(void)handleCursorMove:(NSNotification *)notification {
