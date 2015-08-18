@@ -28,3 +28,18 @@ Screen Shots
 ------------
 
 ![Project Overview](https://wakatime.com/static/img/ScreenShots/ScreenShot-2014-10-29.png)
+
+Troubleshooting
+---------------
+
+First, try running this Terminal command:
+
+```
+rm -rf "~/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master”
+```
+
+Then re-install the WakaTime plugin using Alcatraz.
+
+If that doesn't work, turn on debug mode and check your Xcode log file (`/var/log/system.log`) and your wakatime cli log file (`~/.wakatime.log`).
+
+For more general troubleshooting information, see [wakatime/wakatime#troubleshooting](https://github.com/wakatime/wakatime#troubleshooting).
