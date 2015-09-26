@@ -1,7 +1,7 @@
 xcode-wakatime
 ==============
 
-Fully automatic time tracking for Xcode.
+Quantify your coding inside Xcode.
 
 Installation
 ------------
