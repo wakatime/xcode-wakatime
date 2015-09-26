@@ -1,7 +1,8 @@
 xcode-wakatime
 ==============
 
-Quantify your coding inside Xcode.
+Xcode plugin to quantify your coding using https://wakatime.com/.
+
 
 Installation
 ------------
