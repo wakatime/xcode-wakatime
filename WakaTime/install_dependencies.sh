@@ -12,11 +12,17 @@ set -e
 set -x
 
 url="https://codeload.github.com/wakatime/wakatime/zip/master"
-extract_to="$INSTALL_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
+if [ -d "$INSTALL_DIR" ]; then
+    extract_to="$INSTALL_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
+else
+    extract_to="$HOME/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources"
+fi
 zip_file="$extract_to/wakatime.zip"
 installed_package="$extract_to/wakatime-master"
 
-rm -rf "$installed_package"
+if [ -d "$installed_package" ]; then
+    rm -rf "$installed_package"
+fi
 
 cd "$extract_to"
 
