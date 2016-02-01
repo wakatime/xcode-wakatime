@@ -16,6 +16,8 @@ extract_to="$INSTALL_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
 zip_file="$extract_to/wakatime.zip"
 installed_package="$extract_to/wakatime-master"
 
+rm -rf "$installed_package"
+
 cd "$extract_to"
 
 echo "Downloading wakatime package to $zip_file ..."
