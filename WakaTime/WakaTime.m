@@ -10,7 +10,7 @@
 #import "WakaTime.h"
 #import "XcodeClasses.h"
 
-static NSString *VERSION = @"2.0.8";
+static NSString *VERSION = @"2.0.9";
 static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
 static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/cli.py";

@@ -3,6 +3,26 @@ History
 -------
 
 
+2.0.9 (2016-02-01)
+++++++++++++++++++
+
+- add support for Xcode 7
+- add support for Xcode 6.4
+- add support for Xcode 7 GM
+- add support for Xcode 7.1 Beta
+- add support for Xcode 7.1
+- add support for Xcode 7.2
+- add support for Xcode 7.3 Beta
+
+
+2.0.8 (2015-05-22)
+++++++++++++++++++
+
+- defer creation of WakaTime menu until Xcode GUI has loaded
+- add support for Xcode 6.3.2
+- add support for Xcode 6.3
+
+
 2.0.7 (2015-03-20)
 ++++++++++++++++++
 
