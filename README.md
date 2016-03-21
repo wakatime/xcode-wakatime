@@ -25,10 +25,12 @@ Installation
 
 5. Visit https://wakatime.com to see your logged time.
 
+
 Screen Shots
 ------------
 
-![Project Overview](https://wakatime.com/static/img/ScreenShots/ScreenShot-2014-10-29.png)
+![Project Overview](https://wakatime.com/static/img/ScreenShots/Screen-Shot-2015-11-14.png)
+
 
 Troubleshooting
 ---------------
