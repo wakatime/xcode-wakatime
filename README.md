@@ -35,14 +35,16 @@ Screen Shots
 Troubleshooting
 ---------------
 
-First, try running this Terminal command:
+Try running this Terminal command:
 
 ```
-rm -rf "~/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master”
+bash <(curl -s https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/WakaTime/install_dependencies.sh)
 ```
 
-Then re-install the WakaTime plugin using Alcatraz.
+That will re-download the [wakatime-cli dependency](https://github.com/wakatime/wakatime).
 
-If that doesn't work, turn on debug mode and check your Xcode log file (`/var/log/system.log`) and your wakatime cli log file (`~/.wakatime.log`).
+If that doesn't work, turn on debug mode and check your wakatime cli log file (`~/.wakatime.log`).
+
+If there are no errors in your `~/.wakatime.log` file, check your Xcode log file (`/var/log/system.log`).
 
 For more general troubleshooting information, see [wakatime/wakatime#troubleshooting](https://github.com/wakatime/wakatime#troubleshooting).
