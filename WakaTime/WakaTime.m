@@ -136,10 +136,6 @@ static WakaTime *sharedPlugin;
     }
 }
 
--(void)handleMouseMove:(NSNotification *)notification {
-    NSLog(@"****** %@: %@", notification.name, notification.object);
-}
-
 -(void)sendAction:(BOOL)isWrite {
     if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
