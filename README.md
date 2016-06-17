@@ -3,6 +3,8 @@ xcode-wakatime
 
 Xcode plugin to quantify your coding using https://wakatime.com/.
 
+Warning: Will not work on Xcode 8 since Apple has disabled all unofficial plugins.
+
 
 Installation
 ------------
