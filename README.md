@@ -3,7 +3,7 @@ xcode-wakatime
 
 Xcode plugin to quantify your coding using https://wakatime.com/.
 
-Note: Xcode 8 disables all plugins including WakaTime. Use [unsign](https://github.com/steakknife/unsign) to re-enable plugins in Xcode 8.
+Note: Xcode 8 disables all plugins including WakaTime. Use [this app](https://s3-us-west-1.amazonaws.com/wakatime/MakeXcodeGr8Again.app.zip) to re-enable plugins in Xcode 8.
 
 
 Installation
