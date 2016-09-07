@@ -3,7 +3,9 @@ xcode-wakatime
 
 Xcode plugin to quantify your coding using https://wakatime.com/.
 
-Note: Xcode 8 disables all plugins including WakaTime. Use [this app](https://s3-us-west-1.amazonaws.com/wakatime/MakeXcodeGr8Again.app.zip) to re-enable plugins in Xcode 8.
+Note: Xcode8 disables all plugins including WakaTime. Use [this app](https://s3-us-west-1.amazonaws.com/wakatime/MakeXcodeGr8Again.app.zip) to re-enable plugins in Xcode8.
+Extract the zip, run `MakeXcodeGr8Again.app`, then drag and drop your `Xcode.app` into the program's window to patch your Xcode.
+Alternatively, you can compile this program on your own from [this source code](https://github.com/fpg1503/MakeXcodeGr8Again).
 
 
 Installation
