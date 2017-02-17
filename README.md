@@ -71,7 +71,7 @@ Troubleshooting
 Try running this Terminal command:
 
 ```
-bash <(curl -s https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/WakaTime/install_dependencies.sh)
+curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/WakaTime/install_dependencies.sh | bash
 ```
 
 That will re-download the [wakatime-cli dependency](https://github.com/wakatime/wakatime).
