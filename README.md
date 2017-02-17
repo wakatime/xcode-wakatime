@@ -47,11 +47,11 @@ curl -fsSL https://raw.githubusercontent.com/alanhamlett/MakeXcodeGr8Again/maste
 
 1. Click `Window` -> `Package Manager` inside Xcode.
 
-2) Type `WakaTime`, then click the plugin icon on the left to install.
+2. Type `WakaTime`, then click the plugin icon on the left to install.
   
   ![Alcatraz Window](https://wakatime.com/static/img/ScreenShots/alcatraz_window.png)
 
-3) Restart Xcode.
+3. Restart Xcode.
   
 4. Enter your [api key](https://wakatime.com/settings#apikey), then click `OK`.
 
