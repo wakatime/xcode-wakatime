@@ -19,7 +19,7 @@ Xcode8 disables all plugins. To enable plugins again we have to sign Xcode with 
 
 ### Signing Xcode and Installing Alcatraz Plugin Manager
 
-To modify your original Xcode.app:
+**To modify your original Xcode.app:**
 
 1. Run this in your Terminal:
 
@@ -28,7 +28,7 @@ To modify your original Xcode.app:
   ```
 2. Skip to the [Installing the WakaTime plugin using Alcatraz](#installing-the-wakatime-plugin-using-alcatraz) section below.
 
-To modify a copy of Xcode, follow these steps:
+**To modify a copy of Xcode, follow these steps:**
 
 1. Download [MakeXcodeGr8Again](https://s3-us-west-1.amazonaws.com/wakatime/MakeXcodeGr8Again.app.zip).
 
