@@ -27,7 +27,7 @@ To modify your original Xcode.app:
 export APP=/Applications/Xcode.app; curl -fsSL https://raw.githubusercontent.com/alanhamlett/MakeXcodeGr8Again/master/selfsign.sh | bash
 ```
 
-2. Skip to the `Installing the WakaTime plugin using Alcatraz` section below.
+2. Skip to the [Installing the WakaTime plugin using Alcatraz](#installing-the-wakatime-plugin-using-alcatraz) section below.
 
 To modify a copy of Xcode, follow these steps:
 
