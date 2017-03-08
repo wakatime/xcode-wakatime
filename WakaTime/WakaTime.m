@@ -93,7 +93,7 @@ static WakaTime *sharedPlugin;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
     // check if we should send this action to api
-    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
+    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {        
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendAction:false];
@@ -144,11 +144,19 @@ static WakaTime *sharedPlugin;
         NSMutableArray *arguments = [NSMutableArray array];
         [arguments addObject:[NSHomeDirectory() stringByAppendingPathComponent:WAKATIME_CLI]];
         [arguments addObject:@"--file"];
-        [arguments addObject:self.lastFile];
+    
+        NSString* file = self.lastFile;
+        // Handle Playgrounds
+        if ([file.pathExtension isEqual: @"playground"]) {
+            file = [file stringByAppendingPathComponent:@"Contents.swift"];
+        }
+        
+        [arguments addObject:file];
         [arguments addObject:@"--plugin"];
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
+        
         [task setArguments: arguments];
         [task launch];
     }
