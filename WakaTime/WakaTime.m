@@ -143,14 +143,19 @@ static WakaTime *sharedPlugin;
         
         NSMutableArray *arguments = [NSMutableArray array];
         [arguments addObject:[NSHomeDirectory() stringByAppendingPathComponent:WAKATIME_CLI]];
-        [arguments addObject:@"--file"];
     
         NSString* file = self.lastFile;
         // Handle Playgrounds
         if ([file.pathExtension isEqual: @"playground"]) {
+            [arguments addObject:@"--project"];
+            [arguments addObject:[[self.lastFile lastPathComponent] stringByDeletingPathExtension]];
+            [arguments addObject:@"--language"];
+            [arguments addObject:@"swift"];
+            
             file = [file stringByAppendingPathComponent:@"Contents.swift"];
         }
-        
+
+        [arguments addObject:@"--file"];
         [arguments addObject:file];
         [arguments addObject:@"--plugin"];
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
