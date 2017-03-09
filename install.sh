@@ -7,15 +7,18 @@ PLUGINS_DIR="${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins
 XCODE_VERSION="$(xcrun xcodebuild -version | head -n1 | awk '{ print $2 }')"
 PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
-
-if [ -z "$APP" ]; then
-  APP="/Applications/Xcode.app"
-fi
+APP="/Applications/Xcode.app"
 
 running=$(ps -ef | grep "$APP/Contents/MacOS/Xcode" | wc -l)
 if [ $running != 1 ]; then
   echo "Please quit Xcode before installing."
   exit 1
+fi
+
+if [ $1 == "copy" ]; then
+  echo "Copying Xcode.app to XcodeWithPlugins.app..."
+  cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
+  APP="/Applications/XcodeWithPlugins.app"
 fi
 
 echo "Installing Alcatraz..."
