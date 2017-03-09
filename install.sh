@@ -49,9 +49,10 @@ rm -f "$TMP_FILE"
 # Download and install WakaTime
 mkdir -p "${PLUGINS_DIR}"
 curl -L $DOWNLOAD_URI | tar xvz -C "${PLUGINS_DIR}"
+mv "$PLUGINS_DIR/xcode-wakatime-master" "$PLUGINS_DIR/WakaTime.xcplugin"
 
-echo "Installing dependencies..."
-curl -fsSL https://raw.github.com/wakatime/xcode-wakatime/master/WakaTime/install_dependencies.sh | sh
+# Build WakaTime plugin
+/usr/bin/xcodebuild clean build -project "$PLUGINS_DIR/WakaTime.xcplugin/WakaTime.xcodeproj"
 
 echo "Make sure plugins have the latest Xcode compatibility UUIDs..."
 UUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
