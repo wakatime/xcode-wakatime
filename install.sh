@@ -49,10 +49,10 @@ rm -f "$TMP_FILE"
 # Download and install WakaTime
 mkdir -p "${PLUGINS_DIR}"
 curl -L $DOWNLOAD_URI | tar xvz -C "${PLUGINS_DIR}"
-mv "$PLUGINS_DIR/xcode-wakatime-master" "$PLUGINS_DIR/WakaTime.xcplugin"
 
 # Build WakaTime plugin
-/usr/bin/xcodebuild clean build -project "$PLUGINS_DIR/WakaTime.xcplugin/WakaTime.xcodeproj"
+/usr/bin/xcodebuild clean build -project "$PLUGINS_DIR/xcode-wakatime-master/WakaTime.xcodeproj"
+rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 
 echo "Make sure plugins have the latest Xcode compatibility UUIDs..."
 UUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
@@ -74,8 +74,8 @@ fi
 
 echo "Importing self-signed cert to default keychain, select Allow when prompted..."
 KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
-security import ./XcodeSigner.pem -k "$KEYCHAIN"
-security import ./XcodeSigner.p12 -k "$KEYCHAIN" -P xcodesigner
+security import ./XcodeSigner.pem -k "$KEYCHAIN" || true
+security import ./XcodeSigner.p12 -k "$KEYCHAIN" -P xcodesigner || true
 
 echo "Resigning $APP, this may take a while..."
 sudo codesign -f -s XcodeSigner $APP
