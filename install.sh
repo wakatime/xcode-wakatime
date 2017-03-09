@@ -15,9 +15,9 @@ if [ $running != 1 ]; then
   exit 1
 fi
 
-if [ $1 == "copy" ]; then
+if [ "$1" == "copy" ]; then
   echo "Copying Xcode.app to XcodeWithPlugins.app..."
-  cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
+  sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
   APP="/Applications/XcodeWithPlugins.app"
 fi
 
