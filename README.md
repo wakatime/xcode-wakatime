@@ -9,14 +9,14 @@ Note: Xcode8 disables plugins. Installing WakaTime re-signs Xcode.app with a sel
 Installation
 ------------
 
-1. Run this in a Terminal:
+1. Run this Terminal command:
 
   ```
   curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh
   ```
 
 2. Restart Xcode.
-  
+
 3. Enter your [api key](https://wakatime.com/settings#apikey), then click `OK`.
   (Skip this step if you already have another WakaTime plugin)
 
