@@ -34,7 +34,4 @@ unzip -o "$zip_file"
 
 rm "$zip_file"
 
-echo "Making sure plugins have the latest Xcode compatibility UUIDs..."
-find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add `defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID`
-
 echo "Finished."
