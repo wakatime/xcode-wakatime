@@ -147,8 +147,6 @@ static WakaTime *sharedPlugin;
         NSString* file = self.lastFile;
         // Handle Playgrounds
         if ([file.pathExtension isEqual: @"playground"]) {
-            [arguments addObject:@"--project"];
-            [arguments addObject:[[self.lastFile lastPathComponent] stringByDeletingPathExtension]];
             [arguments addObject:@"--language"];
             [arguments addObject:@"swift"];
             
