@@ -34,12 +34,12 @@ static WakaTime *sharedPlugin;
     static dispatch_once_t onceToken;
     NSString *currentApplicationName = [[NSBundle mainBundle] infoDictionary][@"CFBundleName"];
     if ([currentApplicationName isEqual:@"Xcode"]) {
-        
+
         // Set runtime constants
         CONFIG_FILE = [NSHomeDirectory() stringByAppendingPathComponent:CONFIG_FILE];
         XCODE_VERSION = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
         XCODE_BUILD = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-        
+
         dispatch_once(&onceToken, ^{
             sharedPlugin = [[self alloc] initWithBundle:plugin];
         });
@@ -49,16 +49,16 @@ static WakaTime *sharedPlugin;
 - (id)initWithBundle:(NSBundle *)plugin {
     if (self = [super init]) {
         NSLog(@"Initializing WakaTime plugin v%@ (http://wakatime.com)", VERSION);
-        
+
         // reference to plugin's bundle, for resource access
         self.bundle = plugin;
-        
+
         // Prompt for api_key if not already set
         NSString *api_key = [[self getApiKey] stringByReplacingOccurrencesOfString:@" " withString:@""];
         if (api_key == NULL || [api_key length] == 0) {
             [self promptForApiKey];
         }
-        
+
         // setup event handlers
         NSNotificationCenter *notification_center = [NSNotificationCenter defaultCenter];
         [notification_center addObserver:self selector:@selector(handleChangeFile:) name:@"transition from one file to another" object:nil];
@@ -85,15 +85,15 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleCursorMove:(NSNotification *)notification {
-    
+
     IDEEditorDocument *editorDocument = [(IDESourceCodeEditor *)[notification object] sourceCodeDocument];
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
-    
+
     NSString *currentFile = filePath.pathString;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-    
+
     // check if we should send this action to api
-    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {        
+    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendAction:false];
@@ -101,17 +101,17 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleChangeFile:(NSNotification *)notification {
-    
+
     NSDictionary *dict = notification.object;
     DVTDocumentLocation *next = [dict objectForKey:@"next"];
     if (next == NULL)
         return;
-    
+
     NSString *currentFile = next.documentURLString;
     if ([[currentFile substringToIndex:7] isEqualToString:@"file://"])
         currentFile = [currentFile substringFromIndex:7];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-    
+
     // check if we should send this action to api
     if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
         self.lastFile = currentFile;
@@ -121,13 +121,13 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleSaveFile:(NSNotification *)notification {
-    
+
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)notification.object;
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
-    
+
     NSString *currentFile = filePath.pathString;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-    
+
     // always send action to api if isWrite is true
     if (currentFile) {
         self.lastFile = currentFile;
@@ -140,10 +140,10 @@ static WakaTime *sharedPlugin;
     if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
         [task setLaunchPath: @"/usr/bin/python"];
-        
+
         NSMutableArray *arguments = [NSMutableArray array];
         [arguments addObject:[NSHomeDirectory() stringByAppendingPathComponent:WAKATIME_CLI]];
-    
+
         NSString* file = self.lastFile;
         // Handle Playgrounds
         if ([file.pathExtension isEqual: @"playground"]) {
@@ -156,7 +156,7 @@ static WakaTime *sharedPlugin;
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
-        
+
         [task setArguments: arguments];
         [task launch];
     }
