@@ -9,7 +9,23 @@ PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 
-if [ "$@" = "beta" ]; then
+args="$@"
+
+contains() {
+  string="$1"
+  if [[ -z ${2+x} ]]; then
+    echo "";
+  else
+    substring="$2"
+    if printf %s\\n "${string}" | grep -qF "${substring}"; then
+      echo "1";
+    else
+      echo "";
+    fi
+  fi
+}
+
+if [[ $(contains "$args" "beta") ]]; then
   APP="/Applications/Xcode-beta.app"
 fi
 
@@ -19,7 +35,7 @@ if [ $running != 1 ]; then
   exit 1
 fi
 
-if [ "$@" = "copy" ]; then
+if [[ $(contains "$args" "copy") ]]; then
   echo "Copying Xcode.app to XcodeWithPlugins.app..."
   sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
   APP="/Applications/XcodeWithPlugins.app"
