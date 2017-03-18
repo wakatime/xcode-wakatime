@@ -9,6 +9,10 @@ PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 
+if [ "$@" = "beta" ]; then
+  APP="/Applications/Xcode-beta.app"
+fi
+
 running=$(ps -ef | grep "$APP/Contents/MacOS/Xcode" | wc -l)
 if [ $running != 1 ]; then
   echo "Please quit Xcode before installing."

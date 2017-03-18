@@ -23,6 +23,13 @@ Installation
 4. Use Xcode and your coding activity will be displayed on your [WakaTime dashboard](https://wakatime.com).
 
 
+To install WakaTime for Xcode Beta, run this instead of step 1:
+
+  ```
+  curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh beta | sh
+  ```
+
+
 To clone your `Xcode.app` to preserve the original app signature, run this instead of step 1:
 
   ```
