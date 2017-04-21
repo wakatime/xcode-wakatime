@@ -31,9 +31,12 @@ fi
 
 running=$(ps -ef | grep "$APP/Contents/MacOS/Xcode" | wc -l)
 if [ $running != 1 ]; then
-  echo "Please quit Xcode before installing."
+  echo "Please quit Xcode then try running this script again."
   exit 1
 fi
+
+echo "Enter your computer's password if prompted."
+sudo echo "Password OK."
 
 if [[ $(contains "$args" "copy") ]]; then
   echo "Copying Xcode.app to XcodeWithPlugins.app..."
@@ -109,6 +112,7 @@ if [ "$delP12" = true ]; then
   rm XcodeSigner.p12
 fi
 
-echo "Finished installing WakaTIme. Please re-launch Xcode:"
-echo "open $APP"
+echo "Finished installing WakaTime. Launching Xcode..."
+open "$APP"
+
 exit 0
