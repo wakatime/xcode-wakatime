@@ -35,9 +35,6 @@ if [ "$running" != "" ]; then
   exit 1
 fi
 
-echo "Enter your computer's password if prompted."
-sudo echo "Password OK."
-
 if [[ $(contains "$args" "copy") ]]; then
   echo "Copying Xcode.app to XcodeWithPlugins.app..."
   sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
