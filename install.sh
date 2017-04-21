@@ -29,7 +29,7 @@ if [[ $(contains "$args" "beta") ]]; then
   APP="/Applications/Xcode-beta.app"
 fi
 
-running=$(pgrep Xcode)
+running=$(pgrep Xcode || true)
 if [ "$running" != "" ]; then
   echo "Please quit Xcode then try running this script again."
   exit 1
