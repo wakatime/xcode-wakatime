@@ -29,8 +29,8 @@ if [[ $(contains "$args" "beta") ]]; then
   APP="/Applications/Xcode-beta.app"
 fi
 
-running=$(ps -ef | grep "$APP/Contents/MacOS/Xcode" | wc -l)
-if [ $running != 1 ]; then
+running=$(pgrep Xcode)
+if [ "$running" != "" ]; then
   echo "Please quit Xcode then try running this script again."
   exit 1
 fi
