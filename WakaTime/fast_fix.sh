@@ -78,8 +78,11 @@ echo "Make sure plugins have the latest Xcode compatibility UUIDs..."
 UUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $UUIDS
 
-echo "Finished installing WakaTime. Do you have a File -> WakaTime API Key menu in Xcode now?"
-echo "If not, run the full install script:"
-echo "curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh"
+echo "Finished installing WakaTime."
+echo "************************************************"
+echo "* Do you have a File -> WakaTime API Key menu in Xcode now?"
+echo "* If not, run the full install script:"
+echo "* curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh"
+echo "************************************************"
 
 exit 0
