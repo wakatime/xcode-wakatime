@@ -48,10 +48,10 @@ Troubleshooting
 Try running this Terminal command:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/WakaTime/install_dependencies.sh | sh
+curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/WakaTime/fast_fix.sh | sh
 ```
 
-That will re-download the [wakatime-cli dependency](https://github.com/wakatime/wakatime).
+If the above script doesn't work, try re-running the full install script under the Installation section.
 
 If that doesn't work, turn on debug mode and check your wakatime cli log file (`~/.wakatime.log`).
 
