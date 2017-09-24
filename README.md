@@ -45,13 +45,11 @@ Screen Shots
 Troubleshooting
 ---------------
 
-Try running this Terminal command:
+Try re-installing, which fixes most problems related to upgrading Xcode:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/WakaTime/fast_fix.sh | sh
+curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh
 ```
-
-If the above script doesn't work, try re-running the full install script under the Installation section.
 
 If that doesn't work, turn on debug mode and check your wakatime cli log file (`~/.wakatime.log`).
 
