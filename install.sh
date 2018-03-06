@@ -8,6 +8,7 @@ XCODE_VERSION="$(xcrun xcodebuild -version | head -n1 | awk '{ print $2 }')"
 PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
+CERT_PASS="xcodesigner"
 
 args="$@"
 
@@ -95,7 +96,7 @@ fi
 echo "Importing self-signed cert to default keychain, select Allow when prompted..."
 KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
 security import ./XcodeSigner.pem -k "$KEYCHAIN" || true
-security import ./XcodeSigner.p12 -k "$KEYCHAIN" -P xcodesigner || true
+security import ./XcodeSigner.p12 -k "$KEYCHAIN" -P $CERT_PASS || true
 
 echo "Resigning $APP, this may take a while..."
 sudo codesign -f -s XcodeSigner $APP
