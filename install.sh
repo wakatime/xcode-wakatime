@@ -30,11 +30,6 @@ if [[ $(contains "$args" "beta") ]]; then
   APP="/Applications/Xcode-beta.app"
 fi
 
-LOCAL=0
-if [[ $(contains "$args" "local") ]]; then
-  LOCAL=1
-fi
-
 running=$(pgrep Xcode || true)
 if [ "$running" != "" ]; then
   echo "Please quit Xcode then try running this script again."
@@ -87,19 +82,15 @@ find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.p
 # Install a self-signing cert to enable plugins in Xcode 8
 delPem=false
 if [ ! -f XcodeSigner.pem ]; then
-  if [ ! "$LOCAL" ]; then
-    echo "Downloading self-signed cert public key..."
-    curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.pem -o XcodeSigner.pem
-    delPem=true
-  fi
+  echo "Downloading self-signed cert public key..."
+  curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.pem -o XcodeSigner.pem
+  delPem=true
 fi
 delP12=false
 if [ ! -f XcodeSigner.p12 ]; then
-  if [ ! "$LOCAL" ]; then
-    echo "Downloading self-signed cert private key..."
-    curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.p12 -o XcodeSigner.p12
-    delP12=true
-  fi
+  echo "Downloading self-signed cert private key..."
+  curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.p12 -o XcodeSigner.p12
+  delP12=true
 fi
 
 echo "Importing self-signed cert to default keychain, select Allow when prompted..."
