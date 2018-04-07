@@ -155,11 +155,12 @@ static WakaTime *sharedPlugin;
 
 -(void)handleNotification:(NSNotification *)notification {
     if (![notification.name isEqual:@"NSApplicationWillUpdateNotification"] && ![notification.name isEqual:@"NSApplicationDidUpdateNotification"] && ![notification.name isEqual:@"NSWindowDidUpdateNotification"] && ![notification.name isEqual:@"NSViewBoundsDidChangeNotification"] && ![notification.name isEqual:@"NSScrollViewDidLiveScrollNotification"] && ![notification.name isEqual:@"NSViewDidUpdateTrackingAreasNotification"] && ![notification.name isEqual:@"DVTSourceExpressionUnderMouseDidChangeNotification"] && ![notification.name isEqual:@"NSViewFrameDidChangeNotification"]) {
-        NSLog(@"Notification: %@", notification.name);
+        NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterFullStyle];
+        NSLog(@"Notification %@: %@", dateString, notification.name);
         NSString *path = @"/tmp/xcode-notifications.log";
         NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:path];
         [fileHandle seekToEndOfFile];
-        NSString *output = [NSString stringWithFormat:@"Notification.name: %@\n", notification.name];
+        NSString *output = [NSString stringWithFormat:@"Notification %@: %@\n", dateString, notification.name];
         [fileHandle writeData:[output dataUsingEncoding:NSUTF8StringEncoding]];
         [fileHandle closeFile];
     }
