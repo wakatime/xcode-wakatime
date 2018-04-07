@@ -58,14 +58,22 @@ static WakaTime *sharedPlugin;
         if (api_key == NULL || [api_key length] == 0) {
             [self promptForApiKey];
         }
-
-        // setup event handlers
+        
         NSNotificationCenter *notification_center = [NSNotificationCenter defaultCenter];
+
+        // file event handlers
         [notification_center addObserver:self selector:@selector(handleChangeFile:) name:@"transition from one file to another" object:nil];
         [notification_center addObserver:self selector:@selector(handleSaveFile:) name:@"IDEEditorDocumentDidSaveNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleCursorMove:) name:@"DVTSourceExpressionSelectedExpressionDidChangeNotification" object:nil];
-        //[notification_center addObserver:self selector:@selector(handleMouseMove:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
-
+        
+        // build event handlers
+        [notification_center addObserver:self selector:@selector(handleBuildWillStart:) name:@"IDEBuildOperationWillStartNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleBuildIssuesUpdated:) name:@"IDEBuildIssueProviderUpdatedIssuesNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleBuildStopped:) name:@"IDEBuildOperationDidStopNotification" object:nil];
+        
+        // debug all notifications
+        [notification_center addObserver:self selector:@selector(handleNotification:) name:nil object:nil];
+        
         // setup File menu item
         [self performSelector:@selector(createMenuItem) withObject:nil afterDelay:3];
     }
@@ -85,7 +93,6 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleCursorMove:(NSNotification *)notification {
-
     IDEEditorDocument *editorDocument = [(IDESourceCodeEditor *)[notification object] sourceCodeDocument];
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
 
@@ -101,7 +108,6 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleChangeFile:(NSNotification *)notification {
-
     NSDictionary *dict = notification.object;
     DVTDocumentLocation *next = [dict objectForKey:@"next"];
     if (next == NULL)
@@ -121,7 +127,6 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleSaveFile:(NSNotification *)notification {
-
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)notification.object;
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
 
@@ -133,6 +138,30 @@ static WakaTime *sharedPlugin;
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendAction:true];
+    }
+}
+
+-(void)handleBuildWillStart:(NSNotification *)notification {
+    // noop
+}
+
+-(void)handleBuildIssuesUpdated:(NSNotification *)notification {
+    // noop
+}
+
+-(void)handleBuildStopped:(NSNotification *)notification {
+    // noop
+}
+
+-(void)handleNotification:(NSNotification *)notification {
+    if (![notification.name isEqual:@"NSApplicationWillUpdateNotification"] && ![notification.name isEqual:@"NSApplicationDidUpdateNotification"] && ![notification.name isEqual:@"NSWindowDidUpdateNotification"] && ![notification.name isEqual:@"NSViewBoundsDidChangeNotification"] && ![notification.name isEqual:@"NSScrollViewDidLiveScrollNotification"] && ![notification.name isEqual:@"NSViewDidUpdateTrackingAreasNotification"] && ![notification.name isEqual:@"DVTSourceExpressionUnderMouseDidChangeNotification"] && ![notification.name isEqual:@"NSViewFrameDidChangeNotification"]) {
+        NSLog(@"Notification: %@", notification.name);
+        NSString *path = @"/tmp/xcode-notifications.log";
+        NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:path];
+        [fileHandle seekToEndOfFile];
+        NSString *output = [NSString stringWithFormat:@"Notification.name: %@\n", notification.name];
+        [fileHandle writeData:[output dataUsingEncoding:NSUTF8StringEncoding]];
+        [fileHandle closeFile];
     }
 }
 
