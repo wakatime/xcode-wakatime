@@ -77,10 +77,7 @@ static WakaTime *sharedPlugin;
         
         // build event handlers
         [notification_center addObserver:self selector:@selector(handleBuildWillStart:) name:@"IDEBuildOperationWillStartNotification" object:nil];
-        [notification_center addObserver:self selector:@selector(handleBuilding:) name:@"IDEBuildIssueProviderUpdatedIssuesNotification" object:nil];
-        [notification_center addObserver:self selector:@selector(handleBuilding:) name:@"XCBuildContextDidCreateDependencyGraphNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleBuildStopped:) name:@"IDEBuildOperationDidStopNotification" object:nil];
-        //[notification_center addObserver:self selector:@selector(handleIndexing:) name:@"IDEIndexIsIndexingWorkspaceNotification" object:nil];
         
         // write all notification events to /tmp/xcode-wakatime-debug, if file exists
         //[notification_center addObserver:self selector:@selector(handleNotification:) name:nil object:nil];
@@ -107,7 +104,7 @@ static WakaTime *sharedPlugin;
     IDEEditorDocument *editorDocument = [(IDESourceCodeEditor *)[notification object] sourceCodeDocument];
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
 
-    NSString *currentFile = filePath.pathString;
+    NSString *currentFile = [self stripFileProtocol:filePath.pathString];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
 
     // check if we should send this action to api
@@ -124,9 +121,7 @@ static WakaTime *sharedPlugin;
     if (next == NULL)
         return;
 
-    NSString *currentFile = next.documentURLString;
-    if ([[currentFile substringToIndex:7] isEqualToString:@"file://"])
-        currentFile = [currentFile substringFromIndex:7];
+    NSString *currentFile = [self stripFileProtocol:next.documentURLString];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     NSString *currentCategory = CODING;
 
@@ -142,7 +137,7 @@ static WakaTime *sharedPlugin;
 -(void)handleSaveFile:(NSNotification *)notification {
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)notification.object;
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
-    NSString *currentFile = filePath.pathString;
+    NSString *currentFile = [self stripFileProtocol:filePath.pathString];
     if (currentFile) {
         self.lastFile = currentFile;
         self.lastTime = CFAbsoluteTimeGetCurrent();
@@ -155,22 +150,25 @@ static WakaTime *sharedPlugin;
     self.lastCategory = BUILDING;
     
     NSString *currentFile = [self getLastFileOrProject];
+    [self debug:currentFile];
     if (currentFile) {
         self.lastFile = currentFile;
         self.lastTime = CFAbsoluteTimeGetCurrent();
         [self sendHeartbeat:true];
     }
+    
+    [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
 }
 
--(void)handleBuilding:(NSNotification *)notification {
-    if (!self.isBuilding) {
+-(void)checkStillBuilding {
+    if (!self.isBuilding)
         return;
-    }
     
     BOOL categoryChanged = ![BUILDING isEqualToString:self.lastCategory];
     self.lastCategory = BUILDING;
     
     NSString *currentFile = [self getLastFileOrProject];
+    [self debug:currentFile];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
     if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || categoryChanged)) {
@@ -178,6 +176,8 @@ static WakaTime *sharedPlugin;
         self.lastTime = currentTime;
         [self sendHeartbeat:true];
     }
+    
+    [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
 }
 
 -(void)handleBuildStopped:(NSNotification *)notification {
@@ -185,6 +185,7 @@ static WakaTime *sharedPlugin;
     self.lastCategory = CODING;
     
     NSString *currentFile = [self getLastFileOrProject];
+    [self debug:currentFile];
     if (currentFile) {
         self.lastFile = currentFile;
         self.lastTime = CFAbsoluteTimeGetCurrent();
@@ -211,9 +212,8 @@ static WakaTime *sharedPlugin;
 
         NSString* file = self.lastFile;
         // Handle Playgrounds
-        if ([@"playground" isEqualToString: file.pathExtension]) {
+        if ([@"playground" isEqualToString: file.pathExtension])
             file = [file stringByAppendingPathComponent:@"Contents.swift"];
-        }
 
         [arguments addObject:@"--file"];
         [arguments addObject:file];
@@ -228,23 +228,22 @@ static WakaTime *sharedPlugin;
 
         [task setArguments: arguments];
         [task launch];
+    } else {
+        [self debug:@"Skipping falsy file."];
     }
 }
 
 - (NSString *)getLastFileOrProject {
-    if (self.lastFile) {
+    if (self.lastFile)
         return self.lastFile;
-    }
     
     IDEWorkspaceDocument *workspaceDocument = (IDEWorkspaceDocument *)NSDocumentController.sharedDocumentController.currentDocument;
-    if (!workspaceDocument) {
+    if (!workspaceDocument)
         return nil;
-    }
     NSURL *url = workspaceDocument.fileURL;
-    if (!url || !url.path) {
+    if (!url || !url.path)
         return nil;
-    }
-    return [NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path];
+    return [self stripFileProtocol:[NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path]];
 }
 
 // Read api key from config file
@@ -299,13 +298,20 @@ static WakaTime *sharedPlugin;
     NSString *api_key = [self getApiKey];
     NSAlert *alert = [NSAlert alertWithMessageText:@"Enter your api key from wakatime.com" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@""];
     NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300, 24)];
-    if (api_key != NULL) {
+    if (api_key != NULL)
         [input setStringValue:api_key];
-    }
     [alert setAccessoryView:input];
     [alert runModal];
     api_key = [input stringValue];
     [self saveApiKey:api_key];
+}
+
+-(NSString *)stripFileProtocol:(NSString *)path {
+    if (!path)
+        return nil;
+    if ([[path substringToIndex:7] isEqualToString:@"file://"])
+        return [path substringFromIndex:7];
+    return path;
 }
 
 -(void)debug:(NSString *)msg {
