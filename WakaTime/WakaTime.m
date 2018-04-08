@@ -233,14 +233,12 @@ static WakaTime *sharedPlugin;
 
 - (NSString *)getLastFileOrProject {
     if (self.lastFile) {
-        [self debug:@"Using last file:"];
-        [self debug:self.lastFile];
         return self.lastFile;
     }
     
     [self debug:@"Using workspace document"];
     IDEWorkspaceDocument *workspaceDocument = (IDEWorkspaceDocument *)NSDocumentController.sharedDocumentController.currentDocument;
-    if (!workspaceDocument) {
+    if (workspaceDocument == NULL) {
         [self debug:@"Workspace document falsy"];
         return nil;
     }
