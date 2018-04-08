@@ -101,22 +101,11 @@ static WakaTime *sharedPlugin;
     }
 }
 
--(void)handleCursorMoved:(NSNotification *)notification {
-    IDEEditorDocument *editorDocument = [(IDESourceCodeEditor *)[notification object] sourceCodeDocument];
-    DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
-
-    NSString *currentFile = [self stripFileProtocol:filePath.pathString];
-    CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-
-    // check if we should send this action to api
-    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
-        self.lastFile = currentFile;
-        self.lastTime = currentTime;
-        [self sendHeartbeat:false];
-    }
-}
-
 -(void)handleSourceDiagnosticsChanged:(NSNotification *)notification {
+    // only needed to set file while Xcode launching
+    if (self.lastFile)
+        return;
+    
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)[notification object];
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
     
@@ -132,6 +121,7 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleWindowDidBecomeMain:(NSNotification *)notification {
+    // only needed to set file while Xcode launching
     if (self.lastFile)
         return;
     
@@ -151,6 +141,21 @@ static WakaTime *sharedPlugin;
             self.lastTime = currentTime;
             [self sendHeartbeat:false];
         }
+    }
+}
+
+-(void)handleCursorMoved:(NSNotification *)notification {
+    IDEEditorDocument *editorDocument = [(IDESourceCodeEditor *)[notification object] sourceCodeDocument];
+    DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
+    
+    NSString *currentFile = [self stripFileProtocol:filePath.pathString];
+    CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+    
+    // check if we should send this action to api
+    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
+        self.lastFile = currentFile;
+        self.lastTime = currentTime;
+        [self sendHeartbeat:false];
     }
 }
 
