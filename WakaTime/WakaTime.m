@@ -198,7 +198,7 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleNotification:(NSNotification *)notification {
-    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)\n", notification.name, ((NSObject*)notification.object).className];
+    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)", notification.name, ((NSObject*)notification.object).className];
     [self debug:msg];
 }
 
@@ -228,21 +228,34 @@ static WakaTime *sharedPlugin;
 
         [task setArguments: arguments];
         [task launch];
-    } else {
-        [self debug:@"Skipping falsy file."];
     }
 }
 
 - (NSString *)getLastFileOrProject {
-    if (self.lastFile)
+    if (self.lastFile) {
+        [self debug:@"Using last file:"];
+        [self debug:self.lastFile];
         return self.lastFile;
+    }
     
+    [self debug:@"Using workspace document"];
     IDEWorkspaceDocument *workspaceDocument = (IDEWorkspaceDocument *)NSDocumentController.sharedDocumentController.currentDocument;
-    if (!workspaceDocument)
+    if (!workspaceDocument) {
+        [self debug:@"Workspace document falsy"];
         return nil;
+    }
     NSURL *url = workspaceDocument.fileURL;
-    if (!url || !url.path)
+    if (!url) {
+        [self debug:@"workspaceDocument.fileURL falsy:"];
+        [self debug:url.absoluteString];
         return nil;
+    }
+    if (!url.path) {
+        [self debug:@"workspaceDocument.fileURL.path falsy:"];
+        [self debug:url.absoluteString];
+        [self debug:url.path];
+        return nil;
+    }
     return [self stripFileProtocol:[NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path]];
 }
 
@@ -315,12 +328,17 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)debug:(NSString *)msg {
-    NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterFullStyle];
-    NSLog(@"%@: %@", dateString, msg);
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    [dateFormatter setLocale:enUSPOSIXLocale];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZZ"];
+    NSDate *now = [NSDate date];
+    NSString *dateString = [dateFormatter stringFromDate:now];
+    NSLog(@"%@ %@", dateString, msg);
     NSString *path = @"/tmp/xcode-wakatime-debug.log";
     NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:path];
     [fileHandle seekToEndOfFile];
-    NSString *output = [NSString stringWithFormat:@"%@: %@\n", dateString, msg];
+    NSString *output = [NSString stringWithFormat:@"%@ %@\n", dateString, msg];
     [fileHandle writeData:[output dataUsingEncoding:NSUTF8StringEncoding]];
     [fileHandle closeFile];
 }
