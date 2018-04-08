@@ -82,20 +82,27 @@ find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.p
 # Install a self-signing cert to enable plugins in Xcode 8
 delPem=false
 if [ ! -f XcodeSigner.pem ]; then
-  echo "Downloading self-signed cert public key..."
+  echo "Downloading public key..."
   curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.pem -o XcodeSigner.pem
   delPem=true
 fi
 delP12=false
 if [ ! -f XcodeSigner.p12 ]; then
-  echo "Downloading self-signed cert private key..."
+  echo "Downloading private key..."
   curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.p12 -o XcodeSigner.p12
   delP12=true
+fi
+delCert=false
+if [ ! -f XcodeSigner.cert ]; then
+  echo "Downloading self-signed cert..."
+  curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner.cert -o XcodeSigner.cert
+  delCert=true
 fi
 
 echo "Importing self-signed cert to default keychain, select Allow when prompted..."
 KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
 security import ./XcodeSigner.pem -k "$KEYCHAIN" || true
+security import ./XcodeSigner.cert -k "$KEYCHAIN" || true
 security import ./XcodeSigner.p12 -k "$KEYCHAIN" -P $CERT_PASS || true
 
 echo "Resigning $APP, this may take a while..."
@@ -108,6 +115,10 @@ fi
 if [ "$delP12" = true ]; then
   echo "Cleaning up private key..."
   rm XcodeSigner.p12
+fi
+if [ "$delCert" = true ]; then
+  echo "Cleaning up self-signed cert..."
+  rm XcodeSigner.cert
 fi
 
 echo "Finished installing WakaTime. Launching Xcode..."
