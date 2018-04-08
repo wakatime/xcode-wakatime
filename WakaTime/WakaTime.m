@@ -146,21 +146,27 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleBuildWillStart:(NSNotification *)notification {
+    [self debug:@"handleBuildWillStart"];
     self.isBuilding = true;
     self.lastCategory = BUILDING;
     
     self.lastFile = [self getLastFileOrProject];
     self.lastTime = CFAbsoluteTimeGetCurrent();
-    [self sendHeartbeat:true];
+    [self sendHeartbeat:false];
     
     [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
 }
 
 -(void)checkStillBuilding {
-    if (!self.isBuilding)
+    [self debug:@"checkStillBuilding"];
+    if (!self.isBuilding) {
+        [self debug:@"!self.isBuilding"];
         return;
+    }
     
     BOOL categoryChanged = ![BUILDING isEqualToString:self.lastCategory];
+    [self debug:@"categoryChanged:"];
+    [self debug:categoryChanged ? @"YES" : @"NO"];
     self.lastCategory = BUILDING;
     
     NSString *currentFile = [self getLastFileOrProject];
@@ -169,23 +175,20 @@ static WakaTime *sharedPlugin;
     if (!currentFile || ![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || categoryChanged) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
-        [self sendHeartbeat:true];
+        [self sendHeartbeat:false];
     }
     
     [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
 }
 
 -(void)handleBuildStopped:(NSNotification *)notification {
+    [self debug:@"handleBuildStopped"];
     self.isBuilding = false;
     self.lastCategory = CODING;
     
     self.lastFile = [self getLastFileOrProject];
     self.lastTime = CFAbsoluteTimeGetCurrent();
-    [self sendHeartbeat:true];
-}
-
--(void)handleIndexing:(NSNotification *)notification {
-    // noop
+    [self sendHeartbeat:false];
 }
 
 -(void)handleNotification:(NSNotification *)notification {
@@ -223,6 +226,7 @@ static WakaTime *sharedPlugin;
         [task launch];
     } else if (!isCodingCategory) {
         // must be indexing
+        [self debug:@"indexing"];
     }
 }
 
