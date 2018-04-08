@@ -15,10 +15,10 @@ static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
 static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/cli.py";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
-static int FREQUENCY = 2;  // minutes
-
+static int FREQUENCY = 2; // minutes
 static NSString *CODING = @"coding";
 static NSString *BUILDING = @"building";
+static int BUILD_CHECK_FREQUENCY = 10; // seconds
 
 static WakaTime *sharedPlugin;
 
@@ -71,9 +71,12 @@ static WakaTime *sharedPlugin;
         NSNotificationCenter *notification_center = [NSNotificationCenter defaultCenter];
 
         // file event handlers
-        [notification_center addObserver:self selector:@selector(handleChangeFile:) name:@"transition from one file to another" object:nil];
-        [notification_center addObserver:self selector:@selector(handleSaveFile:) name:@"IDEEditorDocumentDidSaveNotification" object:nil];
-        [notification_center addObserver:self selector:@selector(handleCursorMove:) name:@"DVTSourceExpressionSelectedExpressionDidChangeNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleFileChanged:) name:@"transition from one file to another" object:nil];
+        [notification_center addObserver:self selector:@selector(handleFileSaved:) name:@"IDEEditorDocumentDidSaveNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleCursorMoved:) name:@"DVTSourceExpressionSelectedExpressionDidChangeNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleSourceDiagnosticsChanged:) name:@"SourceEditorDiagnosticsChangedNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleWindowDidBecomeMain:) name:@"NSWindowDidBecomeMainNotification" object:nil];
+        //[notification_center addObserver:self selector:@selector(handleSelectionChanged:) name:@"SourceEditorSelectedSourceRangeChangedNotification" object:nil];
         
         // build event handlers
         [notification_center addObserver:self selector:@selector(handleBuildWillStart:) name:@"IDEBuildOperationWillStartNotification" object:nil];
@@ -100,7 +103,7 @@ static WakaTime *sharedPlugin;
     }
 }
 
--(void)handleCursorMove:(NSNotification *)notification {
+-(void)handleCursorMoved:(NSNotification *)notification {
     IDEEditorDocument *editorDocument = [(IDESourceCodeEditor *)[notification object] sourceCodeDocument];
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
 
@@ -115,7 +118,45 @@ static WakaTime *sharedPlugin;
     }
 }
 
--(void)handleChangeFile:(NSNotification *)notification {
+-(void)handleSourceDiagnosticsChanged:(NSNotification *)notification {
+    IDEEditorDocument *editorDocument = (IDEEditorDocument *)[notification object];
+    DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
+    
+    NSString *currentFile = [self stripFileProtocol:filePath.pathString];
+    CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+    
+    // check if we should send this action to api
+    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
+        self.lastFile = currentFile;
+        self.lastTime = currentTime;
+        [self sendHeartbeat:false];
+    }
+}
+
+-(void)handleWindowDidBecomeMain:(NSNotification *)notification {
+    if (self.lastFile)
+        return;
+    
+    IDEWorkspaceWindow *window = (IDEWorkspaceWindow *)[notification object];
+    IDEEditorDocument *document = [window document];
+    if (!document)
+        return;
+    
+    NSURL *url = document.fileURL;
+    if (url && url.path) {
+        NSString *currentFile = [self stripFileProtocol:[NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path]];
+        CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+        
+        // check if we should send this action to api
+        if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
+            self.lastFile = currentFile;
+            self.lastTime = currentTime;
+            [self sendHeartbeat:false];
+        }
+    }
+}
+
+-(void)handleFileChanged:(NSNotification *)notification {
     NSDictionary *dict = notification.object;
     DVTDocumentLocation *next = [dict objectForKey:@"next"];
     if (next == NULL)
@@ -134,7 +175,7 @@ static WakaTime *sharedPlugin;
     }
 }
 
--(void)handleSaveFile:(NSNotification *)notification {
+-(void)handleFileSaved:(NSNotification *)notification {
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)notification.object;
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
     NSString *currentFile = [self stripFileProtocol:filePath.pathString];
@@ -146,7 +187,6 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)handleBuildWillStart:(NSNotification *)notification {
-    [self debug:@"handleBuildWillStart"];
     self.isBuilding = true;
     self.lastCategory = BUILDING;
     
@@ -154,19 +194,14 @@ static WakaTime *sharedPlugin;
     self.lastTime = CFAbsoluteTimeGetCurrent();
     [self sendHeartbeat:false];
     
-    [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
+    [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:BUILD_CHECK_FREQUENCY];
 }
 
 -(void)checkStillBuilding {
-    [self debug:@"checkStillBuilding"];
-    if (!self.isBuilding) {
-        [self debug:@"!self.isBuilding"];
+    if (!self.isBuilding)
         return;
-    }
     
     BOOL categoryChanged = ![BUILDING isEqualToString:self.lastCategory];
-    [self debug:@"categoryChanged:"];
-    [self debug:categoryChanged ? @"YES" : @"NO"];
     self.lastCategory = BUILDING;
     
     NSString *currentFile = [self getLastFileOrProject];
@@ -178,11 +213,10 @@ static WakaTime *sharedPlugin;
         [self sendHeartbeat:false];
     }
     
-    [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
+    [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:BUILD_CHECK_FREQUENCY];
 }
 
 -(void)handleBuildStopped:(NSNotification *)notification {
-    [self debug:@"handleBuildStopped"];
     self.isBuilding = false;
     self.lastCategory = CODING;
     
@@ -191,13 +225,8 @@ static WakaTime *sharedPlugin;
     [self sendHeartbeat:false];
 }
 
--(void)handleNotification:(NSNotification *)notification {
-    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)", notification.name, ((NSObject*)notification.object).className];
-    [self debug:msg];
-}
-
 -(void)sendHeartbeat:(BOOL)isWrite {
-    BOOL isCodingCategory = !self.lastCategory || [CODING isEqualToString:self.lastCategory];
+    BOOL isCodingCategory = !self.lastCategory || [CODING isEqualTo:self.lastCategory];
     
     if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
@@ -217,16 +246,13 @@ static WakaTime *sharedPlugin;
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
-        if (isCodingCategory) {
+        if (!isCodingCategory) {
             [arguments addObject:@"--category"];
             [arguments addObject:self.lastCategory];
         }
 
         [task setArguments: arguments];
         [task launch];
-    } else if (!isCodingCategory) {
-        // must be indexing
-        [self debug:@"indexing"];
     }
 }
 
@@ -235,12 +261,13 @@ static WakaTime *sharedPlugin;
         return self.lastFile;
     
     IDEWorkspaceDocument *workspaceDocument = (IDEWorkspaceDocument *)NSDocumentController.sharedDocumentController.currentDocument;
-    if (!workspaceDocument)
-        return nil;
-    NSURL *url = workspaceDocument.fileURL;
-    if (!url || !url.path)
-        return nil;
-    return [self stripFileProtocol:[NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path]];
+    if (workspaceDocument) {
+        NSURL *url = workspaceDocument.fileURL;
+        if (url && url.path)
+            return [self stripFileProtocol:[NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path]];
+    }
+    
+    return nil;
 }
 
 // Read api key from config file
@@ -309,6 +336,13 @@ static WakaTime *sharedPlugin;
     if ([[path substringToIndex:7] isEqualToString:@"file://"])
         return [path substringFromIndex:7];
     return path;
+}
+
+-(void)handleNotification:(NSNotification *)notification {
+    if ([notification.name  isEqual: @"NSWindowDidUpdateNotification"] || [notification.name  isEqual: @"NSApplicationWillUpdateNotification"]  || [notification.name  isEqual: @"NSApplicationDidUpdateNotification"])
+        return;
+    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)", notification.name, ((NSObject*)notification.object).className];
+    [self debug:msg];
 }
 
 -(void)debug:(NSString *)msg {
