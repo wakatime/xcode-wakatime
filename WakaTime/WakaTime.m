@@ -149,13 +149,9 @@ static WakaTime *sharedPlugin;
     self.isBuilding = true;
     self.lastCategory = BUILDING;
     
-    NSString *currentFile = [self getLastFileOrProject];
-    [self debug:currentFile];
-    if (currentFile) {
-        self.lastFile = currentFile;
-        self.lastTime = CFAbsoluteTimeGetCurrent();
-        [self sendHeartbeat:true];
-    }
+    self.lastFile = [self getLastFileOrProject];
+    self.lastTime = CFAbsoluteTimeGetCurrent();
+    [self sendHeartbeat:true];
     
     [self performSelector:@selector(checkStillBuilding) withObject:nil afterDelay:10];
 }
@@ -168,10 +164,9 @@ static WakaTime *sharedPlugin;
     self.lastCategory = BUILDING;
     
     NSString *currentFile = [self getLastFileOrProject];
-    [self debug:currentFile];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
-    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || categoryChanged)) {
+    if (!currentFile || ![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || categoryChanged) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendHeartbeat:true];
@@ -184,13 +179,9 @@ static WakaTime *sharedPlugin;
     self.isBuilding = false;
     self.lastCategory = CODING;
     
-    NSString *currentFile = [self getLastFileOrProject];
-    [self debug:currentFile];
-    if (currentFile) {
-        self.lastFile = currentFile;
-        self.lastTime = CFAbsoluteTimeGetCurrent();
-        [self sendHeartbeat:true];
-    }
+    self.lastFile = [self getLastFileOrProject];
+    self.lastTime = CFAbsoluteTimeGetCurrent();
+    [self sendHeartbeat:true];
 }
 
 -(void)handleIndexing:(NSNotification *)notification {
@@ -203,6 +194,8 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)sendHeartbeat:(BOOL)isWrite {
+    BOOL isCodingCategory = !self.lastCategory || [CODING isEqualToString:self.lastCategory];
+    
     if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
         [task setLaunchPath: @"/usr/bin/python"];
@@ -221,39 +214,28 @@ static WakaTime *sharedPlugin;
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
-        if (self.lastCategory && ![CODING isEqualToString:self.lastCategory]) {
+        if (isCodingCategory) {
             [arguments addObject:@"--category"];
             [arguments addObject:self.lastCategory];
         }
 
         [task setArguments: arguments];
         [task launch];
+    } else if (!isCodingCategory) {
+        // must be indexing
     }
 }
 
 - (NSString *)getLastFileOrProject {
-    if (self.lastFile) {
+    if (self.lastFile)
         return self.lastFile;
-    }
     
-    [self debug:@"Using workspace document"];
     IDEWorkspaceDocument *workspaceDocument = (IDEWorkspaceDocument *)NSDocumentController.sharedDocumentController.currentDocument;
-    if (workspaceDocument == NULL) {
-        [self debug:@"Workspace document falsy"];
+    if (!workspaceDocument)
         return nil;
-    }
     NSURL *url = workspaceDocument.fileURL;
-    if (!url) {
-        [self debug:@"workspaceDocument.fileURL falsy:"];
-        [self debug:url.absoluteString];
+    if (!url || !url.path)
         return nil;
-    }
-    if (!url.path) {
-        [self debug:@"workspaceDocument.fileURL.path falsy:"];
-        [self debug:url.absoluteString];
-        [self debug:url.path];
-        return nil;
-    }
     return [self stripFileProtocol:[NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path]];
 }
 
