@@ -99,10 +99,12 @@ if [ ! -f XcodeSigner.cert ]; then
   delCert=true
 fi
 
-echo "Importing self-signed cert to default keychain, select Allow when prompted..."
 KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
-security import ./XcodeSigner.pem -k "$KEYCHAIN" || true
+echo "Importing self-signed cert to default keychain, select Allow when prompted..."
 security import ./XcodeSigner.cert -k "$KEYCHAIN" || true
+echo "Importing public key to default keychain, select Allow when prompted..."
+security import ./XcodeSigner.pem -k "$KEYCHAIN" || true
+echo "Importing private key to default keychain, select Allow when prompted..."
 security import ./XcodeSigner.p12 -k "$KEYCHAIN" -P $CERT_PASS || true
 
 echo "Resigning $APP, this may take a while..."
