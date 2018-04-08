@@ -3,6 +3,14 @@ History
 -------
 
 
+2.1.0 (2018-04-08)
+++++++++++++++++++
+
+- Install script for resigning Xcode 9.
+- Track time spent in Playgrounds.
+- Track time spent building projects.
+
+
 2.0.9 (2016-02-01)
 ++++++++++++++++++
 
