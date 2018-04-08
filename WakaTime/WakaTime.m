@@ -58,7 +58,7 @@ static WakaTime *sharedPlugin;
         // reference to plugin's bundle, for resource access
         self.bundle = plugin;
         
-        self.lastFile = @"";
+        self.lastFile = nil;
         self.lastCategory = nil;
         self.lastTime = 0;
 
