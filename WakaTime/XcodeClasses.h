@@ -28,6 +28,8 @@
 @end
 
 
+@class DVTDocumentLocation;
+
 @interface DVTDocumentLocation : NSObject
 
 @property(readonly) NSString *documentURLString;
@@ -40,5 +42,14 @@
 @interface IDESourceCodeEditor : NSObject
 
 @property (retain) IDEEditorDocument *sourceCodeDocument;
+
+@end
+
+
+@class IDEWorkspaceDocument;
+
+@protocol DVTCancellable, DVTInvalidation;
+
+@interface IDEWorkspaceDocument : NSDocument;
 
 @end

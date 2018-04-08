@@ -17,13 +17,18 @@ static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/X
 static NSString *CONFIG_FILE = @".wakatime.cfg";
 static int FREQUENCY = 2;  // minutes
 
+static NSString *CODING = @"coding";
+static NSString *BUILDING = @"building";
+
 static WakaTime *sharedPlugin;
 
 @interface WakaTime()
 
 @property (nonatomic, strong) NSBundle *bundle;
 @property (nonatomic, strong) NSString *lastFile;
+@property (nonatomic, strong) NSString *lastCategory;
 @property (nonatomic) CFAbsoluteTime lastTime;
+@property (nonatomic) BOOL isBuilding;
 
 @end
 
@@ -52,6 +57,10 @@ static WakaTime *sharedPlugin;
 
         // reference to plugin's bundle, for resource access
         self.bundle = plugin;
+        
+        self.lastFile = @"";
+        self.lastCategory = nil;
+        self.lastTime = 0;
 
         // Prompt for api_key if not already set
         NSString *api_key = [[self getApiKey] stringByReplacingOccurrencesOfString:@" " withString:@""];
@@ -68,11 +77,13 @@ static WakaTime *sharedPlugin;
         
         // build event handlers
         [notification_center addObserver:self selector:@selector(handleBuildWillStart:) name:@"IDEBuildOperationWillStartNotification" object:nil];
-        [notification_center addObserver:self selector:@selector(handleBuildIssuesUpdated:) name:@"IDEBuildIssueProviderUpdatedIssuesNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleBuilding:) name:@"IDEBuildIssueProviderUpdatedIssuesNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleBuilding:) name:@"XCBuildContextDidCreateDependencyGraphNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleBuildStopped:) name:@"IDEBuildOperationDidStopNotification" object:nil];
+        //[notification_center addObserver:self selector:@selector(handleIndexing:) name:@"IDEIndexIsIndexingWorkspaceNotification" object:nil];
         
-        // debug all notifications
-        [notification_center addObserver:self selector:@selector(handleNotification:) name:nil object:nil];
+        // write all notification events to /tmp/xcode-wakatime-debug, if file exists
+        //[notification_center addObserver:self selector:@selector(handleNotification:) name:nil object:nil];
         
         // setup File menu item
         [self performSelector:@selector(createMenuItem) withObject:nil afterDelay:3];
@@ -100,10 +111,10 @@ static WakaTime *sharedPlugin;
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
 
     // check if we should send this action to api
-    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
+    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
-        [self sendAction:false];
+        [self sendHeartbeat:false];
     }
 }
 
@@ -117,56 +128,80 @@ static WakaTime *sharedPlugin;
     if ([[currentFile substringToIndex:7] isEqualToString:@"file://"])
         currentFile = [currentFile substringFromIndex:7];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+    NSString *currentCategory = CODING;
 
     // check if we should send this action to api
-    if (currentFile && (![self.lastFile isEqualToString:currentFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
+    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || ![currentCategory isEqual: self.lastCategory])) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
-        [self sendAction:false];
+        self.lastCategory = BUILDING;
+        [self sendHeartbeat:false];
     }
 }
 
 -(void)handleSaveFile:(NSNotification *)notification {
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)notification.object;
     DVTFilePath *filePath = (DVTFilePath *)editorDocument.filePath;
-
     NSString *currentFile = filePath.pathString;
-    CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-
-    // always send action to api if isWrite is true
     if (currentFile) {
         self.lastFile = currentFile;
-        self.lastTime = currentTime;
-        [self sendAction:true];
+        self.lastTime = CFAbsoluteTimeGetCurrent();
+        [self sendHeartbeat:true];
     }
 }
 
 -(void)handleBuildWillStart:(NSNotification *)notification {
-    // noop
+    self.isBuilding = true;
+    self.lastCategory = BUILDING;
+    
+    NSString *currentFile = [self getLastFileOrProject];
+    if (currentFile) {
+        self.lastFile = currentFile;
+        self.lastTime = CFAbsoluteTimeGetCurrent();
+        [self sendHeartbeat:true];
+    }
 }
 
--(void)handleBuildIssuesUpdated:(NSNotification *)notification {
-    // noop
+-(void)handleBuilding:(NSNotification *)notification {
+    if (!self.isBuilding) {
+        return;
+    }
+    
+    BOOL categoryChanged = ![BUILDING isEqualToString:self.lastCategory];
+    self.lastCategory = BUILDING;
+    
+    NSString *currentFile = [self getLastFileOrProject];
+    CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+    
+    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || categoryChanged)) {
+        self.lastFile = currentFile;
+        self.lastTime = currentTime;
+        [self sendHeartbeat:true];
+    }
 }
 
 -(void)handleBuildStopped:(NSNotification *)notification {
+    self.isBuilding = false;
+    self.lastCategory = CODING;
+    
+    NSString *currentFile = [self getLastFileOrProject];
+    if (currentFile) {
+        self.lastFile = currentFile;
+        self.lastTime = CFAbsoluteTimeGetCurrent();
+        [self sendHeartbeat:true];
+    }
+}
+
+-(void)handleIndexing:(NSNotification *)notification {
     // noop
 }
 
 -(void)handleNotification:(NSNotification *)notification {
-    if (![notification.name isEqual:@"NSApplicationWillUpdateNotification"] && ![notification.name isEqual:@"NSApplicationDidUpdateNotification"] && ![notification.name isEqual:@"NSWindowDidUpdateNotification"] && ![notification.name isEqual:@"NSViewBoundsDidChangeNotification"] && ![notification.name isEqual:@"NSScrollViewDidLiveScrollNotification"] && ![notification.name isEqual:@"NSViewDidUpdateTrackingAreasNotification"] && ![notification.name isEqual:@"DVTSourceExpressionUnderMouseDidChangeNotification"] && ![notification.name isEqual:@"NSViewFrameDidChangeNotification"]) {
-        NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterFullStyle];
-        NSLog(@"Notification %@: %@", dateString, notification.name);
-        NSString *path = @"/tmp/xcode-notifications.log";
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:path];
-        [fileHandle seekToEndOfFile];
-        NSString *output = [NSString stringWithFormat:@"Notification %@: %@\n", dateString, notification.name];
-        [fileHandle writeData:[output dataUsingEncoding:NSUTF8StringEncoding]];
-        [fileHandle closeFile];
-    }
+    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)\n", notification.name, ((NSObject*)notification.object).className];
+    [self debug:msg];
 }
 
--(void)sendAction:(BOOL)isWrite {
+-(void)sendHeartbeat:(BOOL)isWrite {
     if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
         [task setLaunchPath: @"/usr/bin/python"];
@@ -176,7 +211,7 @@ static WakaTime *sharedPlugin;
 
         NSString* file = self.lastFile;
         // Handle Playgrounds
-        if ([file.pathExtension isEqual: @"playground"]) {
+        if ([@"playground" isEqualToString: file.pathExtension]) {
             file = [file stringByAppendingPathComponent:@"Contents.swift"];
         }
 
@@ -186,10 +221,30 @@ static WakaTime *sharedPlugin;
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
+        if (self.lastCategory && ![CODING isEqualToString:self.lastCategory]) {
+            [arguments addObject:@"--category"];
+            [arguments addObject:self.lastCategory];
+        }
 
         [task setArguments: arguments];
         [task launch];
     }
+}
+
+- (NSString *)getLastFileOrProject {
+    if (self.lastFile) {
+        return self.lastFile;
+    }
+    
+    IDEWorkspaceDocument *workspaceDocument = (IDEWorkspaceDocument *)NSDocumentController.sharedDocumentController.currentDocument;
+    if (!workspaceDocument) {
+        return nil;
+    }
+    NSURL *url = workspaceDocument.fileURL;
+    if (!url || !url.path) {
+        return nil;
+    }
+    return [NSString stringWithFormat:@"%@/contents.xcworkspacedata", url.path];
 }
 
 // Read api key from config file
@@ -200,7 +255,7 @@ static WakaTime *sharedPlugin;
         NSArray *line = [s componentsSeparatedByString:@"="];
         if ([line count] == 2) {
             NSString *key = [[line objectAtIndex:0] stringByReplacingOccurrencesOfString:@" " withString:@""];
-            if ([key isEqualToString:@"api_key"]) {
+            if ([@"api_key" isEqualToString:key]) {
                 NSString *value = [[line objectAtIndex:1] stringByReplacingOccurrencesOfString:@" " withString:@""];
                 return value;
             }
@@ -219,7 +274,7 @@ static WakaTime *sharedPlugin;
         NSArray *line = [[s stringByReplacingOccurrencesOfString:@" = " withString:@"="] componentsSeparatedByString:@"="];
         if ([line count] == 2) {
             NSString *key = [line objectAtIndex:0];
-            if ([key isEqualToString:@"api_key"]) {
+            if ([@"api_key" isEqualToString:key]) {
                 found = true;
                 line = @[@"api_key", api_key];
             }
@@ -251,6 +306,17 @@ static WakaTime *sharedPlugin;
     [alert runModal];
     api_key = [input stringValue];
     [self saveApiKey:api_key];
+}
+
+-(void)debug:(NSString *)msg {
+    NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterFullStyle];
+    NSLog(@"%@: %@", dateString, msg);
+    NSString *path = @"/tmp/xcode-wakatime-debug.log";
+    NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:path];
+    [fileHandle seekToEndOfFile];
+    NSString *output = [NSString stringWithFormat:@"%@: %@\n", dateString, msg];
+    [fileHandle writeData:[output dataUsingEncoding:NSUTF8StringEncoding]];
+    [fileHandle closeFile];
 }
 
 - (void)dealloc {
