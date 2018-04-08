@@ -26,7 +26,6 @@ static WakaTime *sharedPlugin;
 
 @property (nonatomic, strong) NSBundle *bundle;
 @property (nonatomic, strong) NSString *lastFile;
-@property (nonatomic, strong) NSString *lastCategory;
 @property (nonatomic) CFAbsoluteTime lastTime;
 @property (nonatomic) BOOL isBuilding;
 
@@ -59,7 +58,6 @@ static WakaTime *sharedPlugin;
         self.bundle = plugin;
         
         self.lastFile = nil;
-        self.lastCategory = nil;
         self.lastTime = 0;
 
         // Prompt for api_key if not already set
@@ -164,13 +162,11 @@ static WakaTime *sharedPlugin;
 
     NSString *currentFile = [self stripFileProtocol:next.documentURLString];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-    NSString *currentCategory = CODING;
 
     // check if we should send this action to api
-    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || ![currentCategory isEqual: self.lastCategory])) {
+    if (currentFile && (![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime)) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
-        self.lastCategory = BUILDING;
         [self sendHeartbeat:false];
     }
 }
@@ -188,7 +184,6 @@ static WakaTime *sharedPlugin;
 
 -(void)handleBuildWillStart:(NSNotification *)notification {
     self.isBuilding = true;
-    self.lastCategory = BUILDING;
     
     self.lastFile = [self getLastFileOrProject];
     self.lastTime = CFAbsoluteTimeGetCurrent();
@@ -201,13 +196,10 @@ static WakaTime *sharedPlugin;
     if (!self.isBuilding)
         return;
     
-    BOOL categoryChanged = ![BUILDING isEqualToString:self.lastCategory];
-    self.lastCategory = BUILDING;
-    
     NSString *currentFile = [self getLastFileOrProject];
     CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
     
-    if (!currentFile || ![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime || categoryChanged) {
+    if (!currentFile || ![currentFile isEqualToString:self.lastFile] || self.lastTime + FREQUENCY * 60 < currentTime) {
         self.lastFile = currentFile;
         self.lastTime = currentTime;
         [self sendHeartbeat:false];
@@ -218,7 +210,6 @@ static WakaTime *sharedPlugin;
 
 -(void)handleBuildStopped:(NSNotification *)notification {
     self.isBuilding = false;
-    self.lastCategory = CODING;
     
     self.lastFile = [self getLastFileOrProject];
     self.lastTime = CFAbsoluteTimeGetCurrent();
@@ -226,8 +217,6 @@ static WakaTime *sharedPlugin;
 }
 
 -(void)sendHeartbeat:(BOOL)isWrite {
-    BOOL isCodingCategory = !self.lastCategory || [CODING isEqualTo:self.lastCategory];
-    
     if (self.lastFile) {
         NSTask *task = [[NSTask alloc] init];
         [task setLaunchPath: @"/usr/bin/python"];
@@ -246,9 +235,9 @@ static WakaTime *sharedPlugin;
         [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
         if (isWrite)
             [arguments addObject:@"--write"];
-        if (!isCodingCategory) {
+        if (self.isBuilding) {
             [arguments addObject:@"--category"];
-            [arguments addObject:self.lastCategory];
+            [arguments addObject:BUILDING];
         }
 
         [task setArguments: arguments];
