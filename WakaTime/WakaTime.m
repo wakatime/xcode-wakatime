@@ -103,7 +103,7 @@ static WakaTime *sharedPlugin;
 
 -(void)handleSourceDiagnosticsChanged:(NSNotification *)notification {
     // only needed to set file while Xcode launching
-    if (self.lastFile)
+    if (self.lastFile && ![self.lastFile hasSuffix:@"contents.xcworkspacedata"])
         return;
     
     IDEEditorDocument *editorDocument = (IDEEditorDocument *)[notification object];
