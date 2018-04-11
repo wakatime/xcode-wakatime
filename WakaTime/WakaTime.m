@@ -16,7 +16,6 @@ static NSString *XCODE_BUILD = nil;
 static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-master/wakatime/cli.py";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
 static int FREQUENCY = 2; // minutes
-static NSString *CODING = @"coding";
 static NSString *BUILDING = @"building";
 static int BUILD_CHECK_FREQUENCY = 10; // seconds
 
