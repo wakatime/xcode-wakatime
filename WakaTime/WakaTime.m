@@ -72,9 +72,10 @@ static WakaTime *sharedPlugin;
         [notification_center addObserver:self selector:@selector(handleFileChanged:) name:@"transition from one file to another" object:nil];
         [notification_center addObserver:self selector:@selector(handleFileSaved:) name:@"IDEEditorDocumentDidSaveNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleCursorMoved:) name:@"DVTSourceExpressionSelectedExpressionDidChangeNotification" object:nil];
+        [notification_center addObserver:self selector:@selector(handleMouseMoved:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
+        //[notification_center addObserver:self selector:@selector(handleSelectionChanged:) name:@"SourceEditorSelectedSourceRangeChangedNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleSourceDiagnosticsChanged:) name:@"SourceEditorDiagnosticsChangedNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleWindowDidBecomeMain:) name:@"NSWindowDidBecomeMainNotification" object:nil];
-        //[notification_center addObserver:self selector:@selector(handleSelectionChanged:) name:@"SourceEditorSelectedSourceRangeChangedNotification" object:nil];
         
         // build event handlers
         [notification_center addObserver:self selector:@selector(handleBuildWillStart:) name:@"IDEBuildOperationWillStartNotification" object:nil];
@@ -136,6 +137,18 @@ static WakaTime *sharedPlugin;
 
     if ([self shouldSendHeartbeat:currentFile time:currentTime]) {
         self.lastFile = currentFile;
+        self.lastTime = currentTime;
+        [self sendHeartbeatWithWrite:false];
+    }
+}
+
+-(void)handleMouseMoved:(NSNotification *)notification {
+    if (!self.lastFile)
+        return;
+    
+    CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+    
+    if ([self shouldSendHeartbeat:self.lastFile time:currentTime]) {
         self.lastTime = currentTime;
         [self sendHeartbeatWithWrite:false];
     }
