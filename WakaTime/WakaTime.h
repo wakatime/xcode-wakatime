@@ -10,5 +10,4 @@
 #import <AppKit/AppKit.h>
 
 @interface WakaTime : NSObject
-
 @end
