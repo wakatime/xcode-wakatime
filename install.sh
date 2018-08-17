@@ -2,6 +2,14 @@
 
 set -euo pipefail
 
+set +e
+xcrun xcodebuild -version > /dev/null 2>/dev/null
+RESULT="$?"
+set -e
+if [ $RESULT != 0 ]; then
+  sudo xcode-select --reset
+fi
+
 DOWNLOAD_URI=https://github.com/wakatime/xcode-wakatime/archive/master.tar.gz
 PLUGINS_DIR="${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
 XCODE_VERSION="$(xcrun xcodebuild -version | head -n1 | awk '{ print $2 }')"
