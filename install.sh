@@ -17,7 +17,7 @@ PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
-DVTUUID=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
+DVTUUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 
 args="$@"
 
@@ -51,14 +51,8 @@ if [[ $(contains "$args" "copy") ]]; then
   APP="/Applications/XcodeWithPlugins.app"
 fi
 
-echo "Make sure existing plugins have the latest Xcode compatibility UUID..."
-find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUID
-
 echo "Installing Alcatraz..."
 curl -fsSL https://raw.github.com/alanhamlett/Alcatraz/master/Scripts/install.sh | sh
-
-echo "Make sure Alcatraz plugin has the latest Xcode compatibility UUID..."
-find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUID
 
 # Remove WakaTime from Xcode's skipped plugins list if needed
 echo "Remove WakaTime from skipped plugins list..."
@@ -91,8 +85,8 @@ echo "Installing WakaTime..."
 /usr/bin/xcodebuild build -project "$PLUGINS_DIR/xcode-wakatime-master/WakaTime.xcodeproj"
 rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 
-echo "Make sure WakaTime plugin has the latest Xcode compatibility UUID..."
-find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUID
+echo "Make sure all installed plugins have the latest Xcode compatibility UUID..."
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUIDS
 
 # Install a self-signing cert to enable plugins in Xcode 8
 delPem=false
