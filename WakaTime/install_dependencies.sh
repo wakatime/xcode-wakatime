@@ -30,7 +30,7 @@ echo "Downloading wakatime package to $zip_file ..."
 curl "$url" -o "$zip_file"
 
 echo "Unzipping wakatime.zip to $installed_package ..."
-unzip -o "$zip_file" -x "*/tests/*" || true
+unzip -q -o "$zip_file" -x "*/tests/*" || true
 
 rm "$zip_file"
 
