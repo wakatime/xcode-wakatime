@@ -53,9 +53,8 @@ fi
 echo "Installing Alcatraz..."
 curl -fsSL https://raw.github.com/alanhamlett/Alcatraz/master/Scripts/install.sh | sh
 
-echo "Installing WakaTime..."
-
 # Remove WakaTime from Xcode's skipped plugins list if needed
+echo "Remove WakaTime from skipped plugins list..."
 TMP_FILE="$(mktemp -t ${BUNDLE_ID})"
 if defaults read com.apple.dt.Xcode "$PLIST_PLUGINS_KEY" &> "$TMP_FILE"; then
   # We read the prefs successfully, delete WakaTime from the skipped list if needed
@@ -76,10 +75,12 @@ fi
 rm -f "$TMP_FILE"
 
 # Download and install WakaTime
+echo "Download WakaTime..."
 mkdir -p "${PLUGINS_DIR}"
 curl -L $DOWNLOAD_URI | tar xvz -C "${PLUGINS_DIR}"
 
 # Build WakaTime plugin
+echo "Installing WakaTime..."
 /usr/bin/xcodebuild clean build -project "$PLUGINS_DIR/xcode-wakatime-master/WakaTime.xcodeproj"
 rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 
