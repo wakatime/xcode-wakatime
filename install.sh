@@ -51,7 +51,7 @@ if [[ $(contains "$args" "copy") ]]; then
 fi
 
 echo "Installing Alcatraz..."
-curl -fsSL https://raw.github.com/alcatraz/Alcatraz/master/Scripts/install.sh | sh
+curl -fsSL https://raw.github.com/alanhamlett/Alcatraz/master/Scripts/install.sh | sh
 
 echo "Installing WakaTime..."
 
