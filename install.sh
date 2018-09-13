@@ -88,7 +88,7 @@ curl -L $DOWNLOAD_URI | tar xvz -C "${PLUGINS_DIR}"
 
 # Build WakaTime plugin
 echo "Installing WakaTime..."
-/usr/bin/xcodebuild clean build -project "$PLUGINS_DIR/xcode-wakatime-master/WakaTime.xcodeproj"
+/usr/bin/xcodebuild build -project "$PLUGINS_DIR/xcode-wakatime-master/WakaTime.xcodeproj"
 rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 
 echo "Make sure WakaTime plugin has the latest Xcode compatibility UUID..."
