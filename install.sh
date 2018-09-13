@@ -17,7 +17,6 @@ PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
-DVTUUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 
 args="$@"
 
@@ -86,6 +85,7 @@ echo "Installing WakaTime..."
 rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 
 echo "Make sure all installed plugins have the latest Xcode compatibility UUID..."
+DVTUUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUIDS
 
 # Install a self-signing cert to enable plugins in Xcode 8
