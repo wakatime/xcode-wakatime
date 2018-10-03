@@ -30,6 +30,13 @@ To install WakaTime for Xcode Beta, run this instead of step 1:
   ```
 
 
+To install WakaTime for Xcode where Xcode was installed to a non-standard folder:
+
+  ```
+  curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s custom /Path/To/Your/Xcode.app
+  ```
+
+
 To clone your `Xcode.app` to preserve the original app signature, run this instead of step 1:
 
   ```

@@ -18,7 +18,7 @@ BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
 
-args="$@"
+args=($@)
 
 contains() {
   string="$1"
@@ -34,17 +34,21 @@ contains() {
   fi
 }
 
-if [[ $(contains "$args" "beta") ]]; then
-  APP="/Applications/Xcode-beta.app"
-fi
-
 running=$(pgrep Xcode || true)
 if [ "$running" != "" ]; then
   echo "Error: Please quit Xcode then try running this script again."
   exit 1
 fi
 
-if [[ $(contains "$args" "copy") ]]; then
+if [[ $(contains ${args[0]} "beta") ]]; then
+  APP="/Applications/Xcode-beta.app"
+fi
+
+if [[ $(contains ${args[0]} "custom") ]]; then
+  APP=${args[${#args[@]} - 1]}
+fi
+
+if [[ $(contains ${args[0]} "copy") ]]; then
   echo "Copying Xcode.app to XcodeWithPlugins.app..."
   sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
   APP="/Applications/XcodeWithPlugins.app"
