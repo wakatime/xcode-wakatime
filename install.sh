@@ -40,7 +40,7 @@ fi
 
 running=$(pgrep Xcode || true)
 if [ "$running" != "" ]; then
-  echo "Please quit Xcode then try running this script again."
+  echo "Error: Please quit Xcode then try running this script again."
   exit 1
 fi
 
@@ -48,6 +48,11 @@ if [[ $(contains "$args" "copy") ]]; then
   echo "Copying Xcode.app to XcodeWithPlugins.app..."
   sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
   APP="/Applications/XcodeWithPlugins.app"
+fi
+
+if [ ! -f "$APP/Contents/Info.plist" ]; then
+  echo "Error: Xcode is not installed at $APP."
+  exit 1
 fi
 
 echo "Installing Alcatraz..."
