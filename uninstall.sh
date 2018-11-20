@@ -17,5 +17,6 @@ echo "Deleting self-signed cert from default keychain..."
 security delete-identity -c XcodeSigner2018
 
 echo "Finished uninstalling WakaTime."
+echo "Optionally, delete <code>XcodeWithPlugins.app</code> from your <code>~/Applications</code> folder if you ran install with the copy argument."
 
 exit 0
