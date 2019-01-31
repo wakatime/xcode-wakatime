@@ -40,18 +40,22 @@ if [ "$running" != "" ]; then
   exit 1
 fi
 
-if [[ $(contains ${args[0]} "beta") ]]; then
-  APP="/Applications/Xcode-beta.app"
-fi
+if [[ ${#args[@]} != "0" ]]; then
 
-if [[ $(contains ${args[0]} "custom") ]]; then
-  APP=${args[${#args[@]} - 1]}
-fi
+  if [[ $(contains ${args[0]} "beta") ]]; then
+    APP="/Applications/Xcode-beta.app"
+  fi
 
-if [[ $(contains ${args[0]} "copy") ]]; then
-  echo "Copying Xcode.app to XcodeWithPlugins.app..."
-  sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
-  APP="/Applications/XcodeWithPlugins.app"
+  if [[ $(contains ${args[0]} "custom") ]]; then
+    APP=${args[${#args[@]} - 1]}
+  fi
+
+  if [[ $(contains ${args[0]} "copy") ]]; then
+    echo "Copying Xcode.app to XcodeWithPlugins.app..."
+    sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
+    APP="/Applications/XcodeWithPlugins.app"
+  fi
+
 fi
 
 if [ ! -f "$APP/Contents/Info.plist" ]; then
