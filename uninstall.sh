@@ -11,7 +11,7 @@ rm -rf "${PLUGINS_DIR}/Alcatraz.xcplugin"
 
 # Delete WakaTime config files from $HOME folder
 echo "Deleting WakaTime config and log files..."
-rm "${HOME}/.wakatime.*"
+rm $HOME/.wakatime.* || true
 
 echo "Deleting self-signed cert from default keychain..."
 security delete-identity -c XcodeSigner2018
