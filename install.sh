@@ -52,7 +52,11 @@ if [[ ${#args[@]} != "0" ]]; then
 
   if [[ $(contains ${args[0]} "copy") ]]; then
     echo "Copying Xcode.app to XcodeWithPlugins.app..."
-    sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
+    if [[ $(diskutil info $(stat -f "%Sd" /Applications/Xcode.app) | grep APFS | wc -l) -gt 0 ]]; then
+      sudo cp -Rpc "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
+    else
+      sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
+    fi
     APP="/Applications/XcodeWithPlugins.app"
   fi
 
