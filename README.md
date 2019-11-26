@@ -1,6 +1,8 @@
 xcode-wakatime
 ==============
 
+[![Coding time tracker](https://wakatime.com/badge/github/wakatime/xcode-wakatime.svg)](https://wakatime.com/badge/github/wakatime/xcode-wakatime)
+
 Xcode plugin to quantify your coding using https://wakatime.com/.
 
 Note: Xcode8 disables plugins. Installing WakaTime re-signs Xcode.app with a self-signed cert.
