@@ -10,12 +10,8 @@ except AttributeError:
 
 
 def main():
-
-    if not len(sys.argv) == 2:
-        return 'Missing Info.plist file from Xcode app contents.'
-
-    file_path = sys.argv[1]
-    with open(file_path, 'rb') as fh:
+    plist_file = sys.argv[1] if len(sys.argv) == 2 else '/Applications/Xcode.app/Contents/Info.plist'
+    with open(plist_file, 'rb') as fh:
         plist = plistlib.load(fh)
 
     print(plist['DVTPlugInCompatibilityUUID'])
