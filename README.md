@@ -54,7 +54,13 @@ Screen Shots
 Troubleshooting
 ---------------
 
-Try re-installing, which fixes most problems related to upgrading Xcode:
+First, do you see the `Xcode → File → WakaTime API Key` menu?
+
+![plugin menu](https://wakatime.com/static/img/plugins/troubleshooting/xcode-menu.png)
+
+If you see that menu, it means the plugin was installed correctly and is running in Xcode... yay! Have a blank dashboard but see the plugin menu? Check your `~/.wakatime.log` file for error messages.
+
+If you don’t see that menu, try re-installing the plugin. That’s needed anytime `Xcode.app` is updated and generally solves most issues:
 
 ```
 curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh
