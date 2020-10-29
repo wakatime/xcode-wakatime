@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+osascript -e 'display notification "Please type your sudo password." with title "WakaTime"'
+
 set +e
 xcrun xcodebuild -version > /dev/null 2>/dev/null
 RESULT="$?"
@@ -126,6 +128,10 @@ if [ ! -f XcodeSigner2018.cert ]; then
   delCert=true
 fi
 
+# fix for https://stackoverflow.com/q/24023639/1290627
+osascript -e 'display notification "Please type your login keychain password." with title "WakaTime"'
+security unlock-keychain login.keychain
+
 KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
 echo "Importing self-signed cert to default keychain, select Allow when prompted..."
 security import ./XcodeSigner2018.cert -k "$KEYCHAIN" || true
@@ -135,6 +141,7 @@ echo "Importing private key to default keychain, select Allow when prompted..."
 security import ./XcodeSigner2018.p12 -k "$KEYCHAIN" -P $CERT_PASS || true
 
 echo "Resigning $APP, this may take a while..."
+osascript -e "display notification \"Re-signing $APP. This may take several minutes.\" with title \"WakaTime\""
 sudo codesign -f -s XcodeSigner2018 $APP
 
 if [ "$delPem" = true ]; then
