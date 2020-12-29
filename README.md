@@ -3,7 +3,7 @@ xcode-wakatime
 
 [![Coding time tracker](https://wakatime.com/badge/github/wakatime/xcode-wakatime.svg)](https://wakatime.com/badge/github/wakatime/xcode-wakatime)
 
-Xcode plugin to quantify your coding using https://wakatime.com/.
+[WakaTime][wakatime] is an open source Xcode plugin for metrics, insights, and time tracking automatically generated from your programming activity.
 
 Note: Xcode8 disables plugins. Installing WakaTime re-signs Xcode.app with a self-signed cert.
 
@@ -85,3 +85,5 @@ To uninstall the WakaTime plugin, config file, and Alcatraz run these Terminal c
 The config file contains your API Key, so make sure to at least run the first two commands.
 Uninstalling Alcatraz is optional, and will prevent other non-WakaTime plugins from loading.
 After uninstalling, restart Xcode and you should no longer see WakaTime under the `File` menu.
+
+[wakatime]: https://wakatime.com/xcode
