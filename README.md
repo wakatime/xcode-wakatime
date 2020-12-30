@@ -81,8 +81,9 @@ To uninstall the WakaTime plugin, config file, and Alcatraz run these Terminal c
     rm -r "${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin"
     rm "${HOME}/.wakatime.cfg"
     rm -r "${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins/Alcatraz.xcplugin"
+    crontab -e
 
-The config file contains your API Key, so make sure to at least run the first two commands.
+When crontab opens, remove the WakaTime line.
 Uninstalling Alcatraz is optional, and will prevent other non-WakaTime plugins from loading.
 After uninstalling, restart Xcode and you should no longer see WakaTime under the `File` menu.
 
