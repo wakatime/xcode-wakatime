@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import plistlib
@@ -6,7 +6,7 @@ import plistlib
 try:
     readPlist = plistlib.load
 except AttributeError:
-    raise Exception('Please use Python3 not py2.')
+    raise Exception('Please use Python3.')
 
 
 def main():
