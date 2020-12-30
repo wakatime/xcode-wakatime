@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# Run this script with cron to receive a notification whenever you need to reinstall the WakaTime extension.
+# For ex, run crontab -e and paste:
+#   */5 * * * * /path/to/check_need_reinstall_plugin.py
+
+
 import os
 import plistlib
 import sys
