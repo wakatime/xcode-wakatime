@@ -3,6 +3,10 @@
 set -euo pipefail
 
 PLUGINS_DIR="${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
+ME="${USER}"
+
+echo "Removing crontab checking for Xcode updates..."
+sudo sed -i '' '/WakaTime/d' "/var/at/tabs/$ME"
 
 # Delete WakaTime and Alcatraz plugins
 echo "Deleting WakaTime and Alcatraz plugin bundles..."
