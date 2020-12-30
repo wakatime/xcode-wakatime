@@ -114,9 +114,9 @@ echo "Make sure all installed plugins have the latest Xcode compatibility UUID..
 DVTUUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUIDS
 
-# Check every 30 minutes if WakaTime needs re-installing
+# Check every 10 minutes if WakaTime needs re-installing
 if ! $ALREADYHASCRON; then
-  echo "*/30 * * * * ${RESOURCES_DIR}/check_need_reinstall_plugin.py" | sudo tee -a "/var/at/tabs/$ME"
+  echo "*/10 * * * * ${RESOURCES_DIR}/check_need_reinstall_plugin.py" | sudo tee -a "/var/at/tabs/$ME"
 fi
 
 # Install a self-signing cert to enable plugins in Xcode 8
