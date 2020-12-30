@@ -21,9 +21,9 @@ BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
 ME="${USER}"
-ALREADYHASCRON="0"
+ALREADYHASCRON=false
 if sudo grep -q WakaTime "/var/at/tabs/$ME"; then
-  ALREADYHASCRON="1"
+  ALREADYHASCRON=true
 fi
 
 args=($@)
