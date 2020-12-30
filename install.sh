@@ -14,11 +14,17 @@ fi
 
 DOWNLOAD_URI=https://github.com/wakatime/xcode-wakatime/archive/master.tar.gz
 PLUGINS_DIR="${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
+RESOURCES_DIR="${HOME}/Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources"
 XCODE_VERSION="$(xcrun xcodebuild -version | head -n1 | awk '{ print $2 }')"
 PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
+ME="${USER}"
+ALREADYHASCRON="0"
+if sudo grep -q WakaTime "/var/at/tabs/$ME"; then
+  ALREADYHASCRON="1"
+fi
 
 args=($@)
 
@@ -107,6 +113,11 @@ rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 echo "Make sure all installed plugins have the latest Xcode compatibility UUID..."
 DVTUUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUIDS
+
+# Check every 30 minutes if WakaTime needs re-installing
+if ! $ALREADYHASCRON; then
+  echo "*/30 * * * * ${RESOURCES_DIR}/check_need_reinstall_plugin.py" | sudo tee -a "/var/at/tabs/$ME"
+fi
 
 # Install a self-signing cert to enable plugins in Xcode 8
 delPem=false
