@@ -116,7 +116,7 @@ find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.p
 
 # Check every 10 minutes if WakaTime needs re-installing
 if ! $ALREADYHASCRON; then
-  echo "*/10 * * * * ${RESOURCES_DIR}/check_need_reinstall_plugin.py" | sudo tee -a "/var/at/tabs/$ME"
+  echo "*/10 * * * * \"${RESOURCES_DIR}/check_need_reinstall_plugin.py\"" | sudo tee -a "/var/at/tabs/$ME"
 fi
 
 # Install a self-signing cert to enable plugins in Xcode 8
