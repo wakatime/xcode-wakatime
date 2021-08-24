@@ -3,6 +3,15 @@ History
 -------
 
 
+3.0.0 (2020-08-24)
+++++++++++++++++++
+
+- Start using new Go wakatime-cli.
+- Prevent logging project file when Xcode first launches.
+- Send heartbeats from mouse motions for improved accuracy.
+- Reset xcode command line tools location if missing with xcode-select --reset.
+
+
 2.1.0 (2018-04-08)
 ++++++++++++++++++
 
