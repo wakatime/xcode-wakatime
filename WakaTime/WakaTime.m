@@ -80,8 +80,10 @@ static WakaTime *sharedPlugin;
         [notification_center addObserver:self selector:@selector(handleBuildWillStart:) name:@"IDEBuildOperationWillStartNotification" object:nil];
         [notification_center addObserver:self selector:@selector(handleBuildStopped:) name:@"IDEBuildOperationDidStopNotification" object:nil];
 
-        // write all notification events to /tmp/xcode-wakatime-debug, if file exists
-        //[notification_center addObserver:self selector:@selector(handleNotification:) name:nil object:nil];
+        // for debugging, uncomment following line to write all notification
+        // events to stdout, and /tmp/xcode-wakatime-debug.log, if file exists
+        // (touch /tmp/xcode-wakatime-debug.log then tail -f /tmp/xcode-wakatime-debug.log)
+        // [notification_center addObserver:self selector:@selector(handleNotification:) name:nil object:nil];
 
         // setup File menu item
         [self performSelector:@selector(createMenuItem) withObject:nil afterDelay:3];
@@ -333,7 +335,11 @@ static WakaTime *sharedPlugin;
 -(void)handleNotification:(NSNotification *)notification {
     if ([notification.name  isEqual: @"NSWindowDidUpdateNotification"] || [notification.name  isEqual: @"NSApplicationWillUpdateNotification"]  || [notification.name  isEqual: @"NSApplicationDidUpdateNotification"])
         return;
-    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)", notification.name, ((NSObject*)notification.object).className];
+    NSString *className = @"UnknownObject";
+    if ([((NSObject*)notification.object) respondsToSelector:@selector(className)]) {
+        className = ((NSObject*)notification.object).className;
+    }
+    NSString *msg = [NSString stringWithFormat:@"Notification.name=%@ (%@)", notification.name, className];
     [self debug:msg];
 }
 
