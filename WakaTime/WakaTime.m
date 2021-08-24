@@ -13,7 +13,7 @@
 static NSString *VERSION = @"2.1.0";
 static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
-static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-cli/wakatime-cli";
+static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-cli-darwin";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
 static int FREQUENCY = 2; // minutes
 static NSString *BUILDING = @"building";
@@ -230,7 +230,7 @@ static WakaTime *sharedPlugin;
         self.lastFile = [self.lastFile stringByAppendingPathComponent:@"Contents.swift"];
 
     NSMutableArray *arguments = [NSMutableArray array];
-    [arguments addObject:@"--file"];
+    [arguments addObject:@"--entity"];
     [arguments addObject:self.lastFile];
     [arguments addObject:@"--plugin"];
     [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
