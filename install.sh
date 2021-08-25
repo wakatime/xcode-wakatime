@@ -22,6 +22,7 @@ APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
 ME="${USER}"
 ALREADYHASCRON=false
+SKIPSIGNING=false
 if sudo grep -q WakaTime "/var/at/tabs/$ME"; then
   ALREADYHASCRON=true
 fi
@@ -66,6 +67,10 @@ if [[ ${#args[@]} != "0" ]]; then
       sudo cp -Rp "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
     fi
     APP="/Applications/XcodeWithPlugins.app"
+  fi
+
+  if [[ $(contains ${args[0]} "nosign") ]]; then
+    SKIPSIGNING=true
   fi
 
 fi
@@ -119,53 +124,57 @@ if ! $ALREADYHASCRON; then
   echo "*/10 * * * * \"${RESOURCES_DIR}/check_need_reinstall_plugin.py\"" | sudo tee -a "/var/at/tabs/$ME"
 fi
 
-# Install a self-signing cert to enable plugins in Xcode 8
-delPem=false
-if [ ! -f XcodeSigner2018.pem ]; then
-  echo "Downloading public key..."
-  curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner2018.pem -o XcodeSigner2018.pem
-  delPem=true
-fi
-delP12=false
-if [ ! -f XcodeSigner2018.p12 ]; then
-  echo "Downloading private key..."
-  curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner2018.p12 -o XcodeSigner2018.p12
-  delP12=true
-fi
-delCert=false
-if [ ! -f XcodeSigner2018.cert ]; then
-  echo "Downloading self-signed cert..."
-  curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner2018.cert -o XcodeSigner2018.cert
-  delCert=true
-fi
+if [ "$SKIPSIGNING" != true ]; then
 
-# fix for https://stackoverflow.com/q/24023639/1290627
-osascript -e 'display notification "Please type your login keychain password." with title "WakaTime"'
-security unlock-keychain login.keychain
+  # Install a self-signing cert to enable plugins in Xcode 8
+  delPem=false
+  if [ ! -f XcodeSigner2018.pem ]; then
+    echo "Downloading public key..."
+    curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner2018.pem -o XcodeSigner2018.pem
+    delPem=true
+  fi
+  delP12=false
+  if [ ! -f XcodeSigner2018.p12 ]; then
+    echo "Downloading private key..."
+    curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner2018.p12 -o XcodeSigner2018.p12
+    delP12=true
+  fi
+  delCert=false
+  if [ ! -f XcodeSigner2018.cert ]; then
+    echo "Downloading self-signed cert..."
+    curl -L https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/XcodeSigner2018.cert -o XcodeSigner2018.cert
+    delCert=true
+  fi
 
-KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
-echo "Importing self-signed cert to default keychain, select Allow when prompted..."
-security import ./XcodeSigner2018.cert -k "$KEYCHAIN" || true
-echo "Importing public key to default keychain, select Allow when prompted..."
-security import ./XcodeSigner2018.pem -k "$KEYCHAIN" || true
-echo "Importing private key to default keychain, select Allow when prompted..."
-security import ./XcodeSigner2018.p12 -k "$KEYCHAIN" -P $CERT_PASS || true
+  # fix for https://stackoverflow.com/q/24023639/1290627
+  osascript -e 'display notification "Please type your login keychain password." with title "WakaTime"'
+  security unlock-keychain login.keychain
 
-echo "Resigning $APP, this may take a while..."
-osascript -e "display notification \"Re-signing $APP. This may take several minutes.\" with title \"WakaTime\""
-sudo codesign -f -s XcodeSigner2018 $APP
+  KEYCHAIN=$(tr -d "\"" <<< `security default-keychain`)
+  echo "Importing self-signed cert to default keychain, select Allow when prompted..."
+  security import ./XcodeSigner2018.cert -k "$KEYCHAIN" || true
+  echo "Importing public key to default keychain, select Allow when prompted..."
+  security import ./XcodeSigner2018.pem -k "$KEYCHAIN" || true
+  echo "Importing private key to default keychain, select Allow when prompted..."
+  security import ./XcodeSigner2018.p12 -k "$KEYCHAIN" -P $CERT_PASS || true
 
-if [ "$delPem" = true ]; then
-  echo "Cleaning up public key..."
-  rm XcodeSigner2018.pem
-fi
-if [ "$delP12" = true ]; then
-  echo "Cleaning up private key..."
-  rm XcodeSigner2018.p12
-fi
-if [ "$delCert" = true ]; then
-  echo "Cleaning up self-signed cert..."
-  rm XcodeSigner2018.cert
+  echo "Resigning $APP, this may take a while..."
+  osascript -e "display notification \"Re-signing $APP. This may take several minutes.\" with title \"WakaTime\""
+  sudo codesign -f -s XcodeSigner2018 $APP
+
+  if [ "$delPem" = true ]; then
+    echo "Cleaning up public key..."
+    rm XcodeSigner2018.pem
+  fi
+  if [ "$delP12" = true ]; then
+    echo "Cleaning up private key..."
+    rm XcodeSigner2018.p12
+  fi
+  if [ "$delCert" = true ]; then
+    echo "Cleaning up self-signed cert..."
+    rm XcodeSigner2018.cert
+  fi
+
 fi
 
 echo "Finished installing WakaTime. Launching Xcode..."
