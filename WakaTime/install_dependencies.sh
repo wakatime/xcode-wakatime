@@ -42,7 +42,7 @@ echo "Installed $installed_binary"
 
 rm "$zip_file"
 
-echo "Downloading wakatime cron script..."
+echo "Downloading wakatime script to check if updates needed..."
 url="https://wakatime-cli.s3-us-west-2.amazonaws.com/check_need_reinstall_plugin.py"
 local_file="$extract_to/check_need_reinstall_plugin.py"
 curl "$url" -o "$local_file"
