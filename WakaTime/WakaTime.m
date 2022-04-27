@@ -13,7 +13,7 @@
 static NSString *VERSION = @"3.0.0";
 static NSString *XCODE_VERSION = nil;
 static NSString *XCODE_BUILD = nil;
-static NSString *WAKATIME_CLI = @"Library/Application Support/Developer/Shared/Xcode/Plug-ins/WakaTime.xcplugin/Contents/Resources/wakatime-cli-darwin";
+static NSString *WAKATIME_CLI = @".wakatime/wakatime-cli";
 static NSString *CONFIG_FILE = @".wakatime.cfg";
 static int FREQUENCY = 2; // minutes
 static NSString *BUILDING = @"building";
