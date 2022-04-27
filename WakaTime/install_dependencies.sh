@@ -23,6 +23,8 @@ extracted_binary="$extract_to/wakatime-cli-darwin-${arch}"
 symlink="$extract_to/wakatime-cli"
 url="https://github.com/wakatime/wakatime-cli/releases/latest/download/wakatime-cli-darwin-${arch}.zip"
 
+mkdir -p "$extract_to"
+
 cd "$extract_to"
 
 echo "Downloading wakatime-cli to $zip_file ..."
