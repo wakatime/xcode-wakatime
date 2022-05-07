@@ -20,12 +20,7 @@ PLIST_PLUGINS_KEY="DVTPlugInManagerNonApplePlugIns-Xcode-${XCODE_VERSION}"
 BUNDLE_ID="WakaTime.WakaTime"
 APP="/Applications/Xcode.app"
 CERT_PASS="xcodesigner"
-ME="${USER}"
-ALREADYHASCRON=false
 SKIPSIGNING=false
-if sudo grep -q WakaTime "/var/at/tabs/$ME"; then
-  ALREADYHASCRON=true
-fi
 
 args=($@)
 
@@ -118,11 +113,6 @@ rm -r "$PLUGINS_DIR/xcode-wakatime-master"
 echo "Make sure all installed plugins have the latest Xcode compatibility UUID..."
 DVTUUIDS=$(defaults read $APP/Contents/Info.plist DVTPlugInCompatibilityUUID)
 find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add $DVTUUIDS
-
-# Check every 10 minutes if WakaTime needs re-installing
-#if ! $ALREADYHASCRON; then
-#  echo "*/10 * * * * \"${RESOURCES_DIR}/check_need_reinstall_plugin.py\"" | sudo tee -a "/var/at/tabs/$ME"
-#fi
 
 if [ "$SKIPSIGNING" != true ]; then
 
