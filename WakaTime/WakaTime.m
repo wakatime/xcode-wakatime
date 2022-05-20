@@ -240,6 +240,11 @@ static WakaTime *sharedPlugin;
         [arguments addObject:@"--category"];
         [arguments addObject:BUILDING];
     }
+    NSString *projectFolder = [self getProjectFolder];
+    if (projectFolder) {
+        [arguments addObject:@"--project-folder"];
+        [arguments addObject:projectFolder];
+    }
 
     [task setArguments: arguments];
     [task launch];
@@ -257,6 +262,23 @@ static WakaTime *sharedPlugin;
     }
 
     return nil;
+}
+
+- (NSString *)getProjectFolder {
+    NSArray *workspaceWindowControllers = [NSClassFromString(@"IDEWorkspaceWindowController") valueForKey:@"workspaceWindowControllers"];
+
+    id workSpace;
+
+    for (id controller in workspaceWindowControllers) {
+        if ([[controller valueForKey:@"window"] isEqual:[NSApp keyWindow]]) {
+            workSpace = [controller valueForKey:@"_workspace"];
+        }
+    }
+
+    if (workSpace == nil) return nil;
+
+    NSString *workspacePath = [[workSpace valueForKey:@"representingFilePath"] valueForKey:@"_pathString"];
+    return workspacePath;
 }
 
 // Read api key from config file
