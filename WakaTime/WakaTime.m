@@ -281,7 +281,7 @@ static WakaTime *sharedPlugin;
     if (workspacePath) {
         NSArray *components = [workspacePath pathComponents];
         if (components.count > 1)
-            return [NSString pathWithComponents: [components subarrayWithRange:(NSRange){ 0, components.count - 2}]];
+            return [NSString pathWithComponents: [components subarrayWithRange:(NSRange){ 0, components.count - 1}]];
     }
 
     return nil;
