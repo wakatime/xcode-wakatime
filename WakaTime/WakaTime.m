@@ -278,7 +278,13 @@ static WakaTime *sharedPlugin;
     if (workSpace == nil) return nil;
 
     NSString *workspacePath = [[workSpace valueForKey:@"representingFilePath"] valueForKey:@"_pathString"];
-    return workspacePath;
+    if (workspacePath) {
+        NSArray *components = [workspacePath pathComponents];
+        if (components.count > 1)
+            return [NSString pathWithComponents: [components subarrayWithRange:(NSRange){ 0, components.count - 2}]];
+    }
+
+    return nil;
 }
 
 // Read api key from config file
