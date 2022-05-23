@@ -75,9 +75,6 @@ if [ ! -f "$APP/Contents/Info.plist" ]; then
   exit 1
 fi
 
-echo "Installing Alcatraz..."
-curl -fsSL https://raw.github.com/alanhamlett/Alcatraz/master/Scripts/install.sh | sh
-
 # Remove WakaTime from Xcode's skipped plugins list if needed
 echo "Remove WakaTime from skipped plugins list..."
 TMP_FILE="$(mktemp -t ${BUNDLE_ID})"
