@@ -5,7 +5,7 @@ set -euo pipefail
 SUDOPROMPT=1
 
 set +e
-sudo xcrun xcodebuild -version > /dev/null 2>/dev/null
+xcrun xcodebuild -version > /dev/null 2>/dev/null
 XCRUNRESULT="$?"
 set -e
 if [ $XCRUNRESULT != 0 ]; then
