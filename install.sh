@@ -2,14 +2,16 @@
 
 set -euo pipefail
 
-osascript -e 'display notification "Please type your sudo password." with title "WakaTime"'
+SUDOPROMPT=1
 
 set +e
-xcrun xcodebuild -version > /dev/null 2>/dev/null
-RESULT="$?"
+sudo xcrun xcodebuild -version > /dev/null 2>/dev/null
+XCRUNRESULT="$?"
 set -e
-if [ $RESULT != 0 ]; then
+if [ $XCRUNRESULT != 0 ]; then
+  osascript -e 'display notification "Please type your sudo password if prompted." with title "WakaTime"'
   sudo xcode-select --reset
+  SUDOPROMPT=0
 fi
 
 DOWNLOAD_URI=https://github.com/wakatime/xcode-wakatime/archive/master.tar.gz
@@ -56,6 +58,10 @@ if [[ ${#args[@]} != "0" ]]; then
 
   if [[ $(contains ${args[0]} "copy") ]]; then
     echo "Copying Xcode.app to XcodeWithPlugins.app..."
+    if [ $SUDOPROMPT ]; then
+      osascript -e 'display notification "Please type your sudo password if prompted." with title "WakaTime"'
+      SUDOPROMPT=0
+    fi
     if [[ $(diskutil info $(stat -f "%Sd" /Applications/Xcode.app) | grep APFS | wc -l) -gt 0 ]]; then
       sudo cp -Rpc "/Applications/Xcode.app" "/Applications/XcodeWithPlugins.app"
     else
@@ -147,6 +153,10 @@ if [ "$SKIPSIGNING" != true ]; then
 
   echo "Resigning $APP, this may take a while..."
   osascript -e "display notification \"Re-signing $APP. This may take several minutes.\" with title \"WakaTime\""
+  if [ $SUDOPROMPT ]; then
+    osascript -e 'display notification "Please type your sudo password if prompted." with title "WakaTime"'
+    SUDOPROMPT=0
+  fi
   sudo codesign -f -s XcodeSigner2018 $APP
 
   if [ "$delPem" = true ]; then
