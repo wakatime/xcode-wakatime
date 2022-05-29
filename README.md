@@ -24,6 +24,24 @@ Installation
 
 4. Use Xcode and your coding activity will be displayed on your [WakaTime dashboard](https://wakatime.com).
 
+Alternatively, to install WakaTime for Xcode without re-signing (so you can still publish to the App Store), run this instead of step 1:
+
+  ```
+  sudo defaults write /Library/Preferences/com.apple.security.libraryvalidation.plist DisableLibraryValidation -bool true
+  curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s nosign
+  ```
+
+To clone your `Xcode.app` to preserve the original app signature, run this instead of step 1:
+
+  ```
+  curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s copy
+  ```
+
+To clone your `Xcode.app` to preserve the original app signature, run this instead of step 1:
+
+  ```
+  curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s copy
+  ```
 
 To install WakaTime for Xcode Beta, run this instead of step 1:
 
@@ -31,19 +49,12 @@ To install WakaTime for Xcode Beta, run this instead of step 1:
   curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s beta
   ```
 
-
 To install WakaTime for Xcode where Xcode was installed to a non-standard folder:
 
   ```
   curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s custom /Path/To/Your/Xcode.app
   ```
 
-
-To clone your `Xcode.app` to preserve the original app signature, run this instead of step 1:
-
-  ```
-  curl -fsSL https://raw.githubusercontent.com/wakatime/xcode-wakatime/master/install.sh | sh -s copy
-  ```
 
 Screen Shots
 ------------
