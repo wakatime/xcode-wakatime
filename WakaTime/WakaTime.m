@@ -247,7 +247,9 @@ static WakaTime *sharedPlugin;
     }
 
     [task setArguments: arguments];
-    [task launch];
+
+    NSError* err;
+    [task launchAndReturnError:&err];
 }
 
 - (NSString *)getLastFileOrProject {

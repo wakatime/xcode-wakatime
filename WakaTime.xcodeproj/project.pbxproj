@@ -294,6 +294,7 @@
 				GCC_PREFIX_HEADER = "WakaTime/WakaTime-Prefix.pch";
 				INFOPLIST_FILE = "WakaTime/WakaTime-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = "WakaTime.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xcplugin;
@@ -310,6 +311,7 @@
 				GCC_PREFIX_HEADER = "WakaTime/WakaTime-Prefix.pch";
 				INFOPLIST_FILE = "WakaTime/WakaTime-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = "WakaTime.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xcplugin;
