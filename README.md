@@ -5,6 +5,8 @@ xcode-wakatime
 
 [WakaTime][wakatime] is an open source Xcode plugin for metrics, insights, and time tracking automatically generated from your programming activity.
 
+**Note: Unfortunately, Apple has decided to stop loading plugins in Xcode 14. We currently have no way to get around this and no way to get the WakaTime plugin for Xcode working.**
+
 Note: Xcode8 disables plugins. Installing WakaTime re-signs Xcode.app with a self-signed cert.
 
 
