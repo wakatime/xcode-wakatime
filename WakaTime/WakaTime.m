@@ -233,7 +233,7 @@ static WakaTime *sharedPlugin;
     [arguments addObject:@"--entity"];
     [arguments addObject:self.lastFile];
     [arguments addObject:@"--plugin"];
-    [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
+    [arguments addObject:[NSString stringWithFormat:@"xcode/%@-%@ xcode-wakatime-legacy/%@", XCODE_VERSION, XCODE_BUILD, VERSION]];
     if (write)
         [arguments addObject:@"--write"];
     if (self.isBuilding) {
