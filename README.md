@@ -1,6 +1,8 @@
 xcode-wakatime
 ==============
 
+### DEPRECATED: Use [this new repo](https://github.com/wakatime/xcode-wakatime) instead.
+
 [![Coding time tracker](https://wakatime.com/badge/github/wakatime/xcode-wakatime.svg)](https://wakatime.com/badge/github/wakatime/xcode-wakatime)
 
 [WakaTime][wakatime] is an open source Xcode plugin for metrics, insights, and time tracking automatically generated from your programming activity.
