@@ -1,7 +1,7 @@
 xcode-wakatime
 ==============
 
-### DEPRECATED: Use [this new repo](https://github.com/wakatime/xcode-wakatime) instead.
+## DEPRECATED: Use [this new repo](https://github.com/wakatime/macos-wakatime) instead.
 
 [![Coding time tracker](https://wakatime.com/badge/github/wakatime/xcode-wakatime.svg)](https://wakatime.com/badge/github/wakatime/xcode-wakatime)
 
